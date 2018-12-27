@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div v-if="endpointsNode">
     <div class="_endpoint_div_content">
       <endpoint-component v-for="(endpoint, index) in endpointsNode"
                           :key="index"
@@ -11,7 +11,8 @@
 
 <script>
 import endpointComponent from "./endpointComponent.vue";
-import utilities from "../getEndpoints";
+import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
 export default {
   name: "dashboard-panel",
@@ -24,7 +25,6 @@ export default {
   methods: {
     opened(option, viewer) {
       this.getEndpointsNode(option).then(el => {
-        console.log(el);
         this.endpointsNode = el;
       });
     },
@@ -36,9 +36,12 @@ export default {
       console.log("closed option", option);
       console.log("closed viewer", viewer);
     },
-    async getEndpointsNode(node) {
-      let endpointsNode = await spinalNode.getChildren(ENDPOINT_RELATION_NAME);
-      return endpointsNode;
+    getEndpointsNode(node) {
+      return SpinalGraphService.getChildren(node.id.get(), [
+        dashboardVariables.ENDPOINT_RELATION_NAME
+      ]).then(el => {
+        return el;
+      });
     }
   }
 };

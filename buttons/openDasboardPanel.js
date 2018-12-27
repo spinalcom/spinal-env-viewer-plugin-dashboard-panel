@@ -7,7 +7,11 @@ const {
 } = require("spinal-env-viewer-panel-manager-service");
 
 import {
-  dashboardService
+  SpinalGraphService
+} from "spinal-env-viewer-graph-service";
+
+import {
+  dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
 class OpenDashboardPanel extends SpinalContextApp {
@@ -21,7 +25,11 @@ class OpenDashboardPanel extends SpinalContextApp {
   }
 
   isShown(option) {
-    return Promise.resolve(true);
+    return SpinalGraphService.getChildren(option.selectedNode.id.get(),
+      [dashboardVariables.ENDPOINT_RELATION_NAME]).then(el => {
+      if (el.length > 0) return true;
+      return -1;
+    })
   }
 
   action(option) {

@@ -32,7 +32,7 @@ export default {
   methods: {
     async getEndpointValue() {
       if (this.endpointNode) {
-        let endpointElement = await this.endpointNode.getElement();
+        let endpointElement = await this.endpointNode.element.load();
 
         endpointElement.bind(() => {
           this.endpoint = this.getEndpointDetail(endpointElement);
@@ -40,7 +40,6 @@ export default {
       }
     },
     getEndpointDetail(endpoint) {
-      console.log(endpoint);
       var endpointToObject = {};
 
       endpointToObject["id"] = endpoint.id.get();
@@ -72,6 +71,10 @@ div .endpointContent {
   padding: 7px;
   margin: 5px;
   background: #242424;
+}
+
+div .endpointContent:hover {
+  cursor: pointer;
 }
 
 div .endpointContent .endpointDiv .name {
