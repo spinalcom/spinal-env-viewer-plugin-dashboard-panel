@@ -10,7 +10,7 @@
       </div>
       <div class="value"
            :title="endpoint.currentValue">
-        <div class="currentValue">{{endpoint.currentValue}}</div>
+        <div class="currentValue">{{formatCurrentValue(endpoint.currentValue)}}</div>
         <div class="currentUnit">{{endpoint.unit}}</div>
       </div>
     </div>
@@ -52,6 +52,15 @@ export default {
       endpointToObject["currentValue"] = endpoint.currentValue.get();
 
       return endpointToObject;
+    },
+    formatCurrentValue: function(argCurrentValue) {
+      var argCurrentValueNumber = Number(argCurrentValue);
+      if (
+        !isNaN(argCurrentValueNumber) &&
+        !Number.isInteger(argCurrentValueNumber)
+      )
+        return Number(argCurrentValue).toFixed(2);
+      return argCurrentValue;
     }
   },
   watch: {
