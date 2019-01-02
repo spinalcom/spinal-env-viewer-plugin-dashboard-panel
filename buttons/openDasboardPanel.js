@@ -16,8 +16,8 @@ import {
 
 class OpenDashboardPanel extends SpinalContextApp {
   constructor() {
-    super("open dashboard", "open dashboard", {
-      icon: "dashboard",
+    super("open in dashboard panel", "open dashboard", {
+      icon: "show_chart",
       icon_type: "in",
       backgroundColor: "#FF0000",
       fontColor: "#FFFFFF"
