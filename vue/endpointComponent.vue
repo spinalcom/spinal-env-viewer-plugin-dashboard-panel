@@ -1,5 +1,4 @@
 
-
 <template>
   <div class="endpointContent">
     <div v-if="endpoint"
@@ -23,7 +22,9 @@ export default {
   props: ["endpointNode"],
   data() {
     return {
-      endpoint: null
+      endpoint: null,
+      endpointBinded: null,
+      endpointElement: null
     };
   },
   mounted() {
@@ -32,10 +33,10 @@ export default {
   methods: {
     async getEndpointValue() {
       if (this.endpointNode) {
-        let endpointElement = await this.endpointNode.element.load();
+        this.endpointElement = await this.endpointNode.element.load();
 
-        endpointElement.bind(() => {
-          this.endpoint = this.getEndpointDetail(endpointElement);
+        this.endpointBinded = this.endpointElement.bind(() => {
+          this.endpoint = this.getEndpointDetail(this.endpointElement);
         });
       }
     },
@@ -44,9 +45,9 @@ export default {
 
       endpointToObject["id"] = endpoint.id.get();
       endpointToObject["name"] = endpoint.name.get();
-      endpointToObject["path"] = endpoint.path.get();
-      endpointToObject["min"] = endpoint.seuilMin.get();
-      endpointToObject["max"] = endpoint.seuilMax.get();
+      // endpointToObject["path"] = endpoint.path.get();
+      // endpointToObject["min"] = endpoint.seuilMin.get();
+      // endpointToObject["max"] = endpoint.seuilMax.get();
       endpointToObject["unit"] = endpoint.unit.get();
       endpointToObject["type"] = endpoint.dataType.get();
       endpointToObject["currentValue"] = endpoint.currentValue.get();
@@ -65,6 +66,7 @@ export default {
   },
   watch: {
     endpointNode: function() {
+      this.endpointElement.unbind(this.endpointBinded);
       this.getEndpointValue();
     }
   }
