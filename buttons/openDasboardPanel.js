@@ -14,6 +14,10 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
+let hasEndPoint = "hasEndPoint";
+
+// import { Spina } from 'spinal-model-bmsNetwork';
+
 class OpenDashboardPanel extends SpinalContextApp {
   constructor() {
     super("open in dashboard panel", "open dashboard", {
@@ -26,7 +30,7 @@ class OpenDashboardPanel extends SpinalContextApp {
 
   isShown(option) {
     return SpinalGraphService.getChildren(option.selectedNode.id.get(),
-      [dashboardVariables.ENDPOINT_RELATION_NAME]).then(el => {
+      [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint]).then(el => {
       if (el.length > 0) return true;
       return -1;
     })

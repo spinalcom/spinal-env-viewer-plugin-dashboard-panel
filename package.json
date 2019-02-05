@@ -1,6 +1,6 @@
 {
   "name": "spinal-env-viewer-plugin-dashboard-panel",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,14 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
-    "spinalgraph": "git+https://github.com/spinalcom/spinal-model-graph.git#v01",
+    "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
     "spinal-env-viewer-context-menu-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-menu-service.git",
+    "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
     "spinal-env-viewer-panel-manager-service": "git+https://github.com/spinalcom/spinal-env-viewer-panel-manager-service.git",
     "spinal-env-viewer-panel-manager-service_spinalforgeextention": "git+https://github.com/spinalcom/spinal-env-viewer-panel-manager-service_spinalforgeextention.git",
+    "spinal-env-viewer-plugin-endpoint_chart_viewer": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-endpoint_chart_viewer.git",
+    "spinal-model-bmsNetwork": "git+https://github.com/spinalcom/spinal-model-bmsNetwork.git",
     "spinal-models-building-elements": "git+https://github.com/spinalcom/spinal-models-building-elements.git",
-    "spinal-models-bmsNetwork": "git+https://github.com/spinalcom/spinal-models-bmsNetwork.git",
-    "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git"
+    "spinalgraph": "git+https://github.com/spinalcom/spinal-model-graph.git#v01"
   },
   "browserify": {
     "transform": [

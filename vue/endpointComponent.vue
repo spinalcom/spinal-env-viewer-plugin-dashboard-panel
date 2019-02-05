@@ -1,6 +1,7 @@
 
 <template>
-  <div class="endpointContent">
+  <div @click="selectEndpoint"
+       :class=" {'endpointContent' : true, endpointSelected : isSelected()}">
     <div v-if="endpoint"
          class="endpointDiv">
       <div class="name"
@@ -12,15 +13,39 @@
         <div class="currentValue">{{formatCurrentValue(endpoint.currentValue)}}</div>
         <div class="currentUnit">{{endpoint.unit}}</div>
       </div>
+      <div class="btnGroup">
+        <md-button v-for="icon in iconsItems"
+                   :key="icon.iconName"
+                   class="md-icon-button md-dense"
+                   :title="icon.title"
+                   @click="icon.clickMethod">
+          <md-icon>
+            {{icon.iconName}}
+          </md-icon>
+        </md-button>
+      </div>
     </div>
+
   </div>
 </template>
 
 <script>
+const {
+  spinalPanelManagerService
+} = require("spinal-env-viewer-panel-manager-service");
+
 export default {
   name: "endpointComponent",
-  props: ["endpointNode"],
+  props: ["endpointNode", "endpointSelected"],
   data() {
+    this.iconsItems = [
+      {
+        title: "open Graph Panel",
+        clickMethod: this.openGraphPanel,
+        iconName: "pie_chart"
+      }
+    ];
+
     return {
       endpoint: null,
       endpointBinded: null,
@@ -42,16 +67,11 @@ export default {
     },
     getEndpointDetail(endpoint) {
       var endpointToObject = {};
-
       endpointToObject["id"] = endpoint.id.get();
       endpointToObject["name"] = endpoint.name.get();
-      // endpointToObject["path"] = endpoint.path.get();
-      // endpointToObject["min"] = endpoint.seuilMin.get();
-      // endpointToObject["max"] = endpoint.seuilMax.get();
       endpointToObject["unit"] = endpoint.unit.get();
       endpointToObject["type"] = endpoint.dataType.get();
       endpointToObject["currentValue"] = endpoint.currentValue.get();
-
       return endpointToObject;
     },
     formatCurrentValue: function(argCurrentValue) {
@@ -62,6 +82,21 @@ export default {
       )
         return Number(argCurrentValue).toFixed(2);
       return argCurrentValue;
+    },
+    selectEndpoint: function() {
+      this.$emit("selectEndpoint", this.endpointNode);
+    },
+    isSelected() {
+      return (
+        this.endpointNode &&
+        this.endpointSelected &&
+        this.endpointNode.id.get() === this.endpointSelected.id.get()
+      );
+    },
+    openGraphPanel() {
+      spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
+        selectedNode: this.endpointNode
+      });
     }
   },
   watch: {
@@ -80,12 +115,21 @@ div .endpointContent {
   display: inline-block;
   justify-content: center;
   padding: 7px;
-  margin: 5px;
-  background: #242424;
+  margin: 4px;
+  border: 1px solid;
+}
+
+div .endpointSelected {
+  background: #356bab !important;
 }
 
 div .endpointContent:hover {
   cursor: pointer;
+}
+
+div .endpointContent .endpointDiv {
+  width: calc(100%);
+  height: calc(100%);
 }
 
 div .endpointContent .endpointDiv .name {
@@ -121,5 +165,16 @@ div .endpointContent .endpointDiv .value .currentValue {
 div .endpointContent .endpointDiv .value .currentUnit {
   text-align: right;
   font-size: 10px;
+}
+
+div .endpointContent .btnGroup {
+  width: 100%;
+  height: 20%;
+}
+
+div .endpointContent .btnGroup .md-icon {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 20px !important;
 }
 </style>
