@@ -1,7 +1,9 @@
 
+import { log } from 'util';
 <template>
   <div @click="selectEndpoint"
-       :class=" {'endpointContent' : true, endpointSelected : isSelected()}">
+       :class=" {'endpointContent' : true, endpointSelected : isSelected()}"
+       :style="style">
     <div v-if="endpoint"
          class="endpointDiv">
       <div class="name"
@@ -36,7 +38,7 @@ const {
 
 export default {
   name: "endpointComponent",
-  props: ["endpointNode", "endpointSelected"],
+  props: ["endpointNode", "endpointSelected", "itemCount"],
   data() {
     this.iconsItems = [
       {
@@ -104,13 +106,20 @@ export default {
       this.endpointElement.unbind(this.endpointBinded);
       this.getEndpointValue();
     }
+  },
+  computed: {
+    style() {
+      return {
+        width: `calc(100% / ${this.itemCount} - 24px)`
+      };
+    }
   }
 };
 </script>
 
-<style>
+<style scoped>
 div .endpointContent {
-  width: calc(100% / 3 - 24px);
+  /* width: calc(100% / 3 - 24px); */
   height: 130px;
   display: inline-block;
   justify-content: center;
