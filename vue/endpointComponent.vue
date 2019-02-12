@@ -1,5 +1,4 @@
 
-import { log } from 'util';
 <template>
   <div @click="selectEndpoint"
        :class=" {'endpointContent' : true, endpointSelected : isSelected()}"
@@ -7,14 +6,29 @@ import { log } from 'util';
     <div v-if="endpoint"
          class="endpointDiv">
       <div class="name"
-           :title="endpoint.name">
+           v-tooltip="endpoint.name">
         {{endpoint.name}}
       </div>
       <div class="value"
-           :title="endpoint.currentValue">
+           v-tooltip="'Value : ' + endpoint.currentValue + ' ' + endpoint.unit">
         <div class="currentValue">{{formatCurrentValue(endpoint.currentValue)}}</div>
         <div class="currentUnit">{{endpoint.unit}}</div>
       </div>
+
+      <!-- <div class="typeInfo">
+        <div class="type"
+             v-tooltip="'type : ' + endpoint.type">
+          <md-icon>category</md-icon>
+          <span>{{endpoint.type}}</span>
+        </div>
+        <div class="reference"
+             v-tooltip="'Reference : ' + endpoint.type"
+             v-if="endpoint.ref">
+          <md-icon>link</md-icon>
+          <span>{{endpoint.ref}}</span>
+        </div>
+      </div> -->
+
       <div class="btnGroup">
         <md-button v-for="icon in iconsItems"
                    :key="icon.iconName"
@@ -72,7 +86,10 @@ export default {
       endpointToObject["id"] = endpoint.id.get();
       endpointToObject["name"] = endpoint.name.get();
       endpointToObject["unit"] = endpoint.unit.get();
-      endpointToObject["type"] = endpoint.dataType.get();
+      endpointToObject["type"] = endpoint.type.get();
+      endpointToObject["ref"] = endpoint.referenceOf
+        ? endpoint.referenceOf.get()
+        : undefined;
       endpointToObject["currentValue"] = endpoint.currentValue.get();
       return endpointToObject;
     },
@@ -127,20 +144,16 @@ div .endpointContent {
   margin: 4px;
   border: 1px solid;
 }
-
 div .endpointSelected {
   background: #356bab !important;
 }
-
 div .endpointContent:hover {
   cursor: pointer;
 }
-
 div .endpointContent .endpointDiv {
   width: calc(100%);
   height: calc(100%);
 }
-
 div .endpointContent .endpointDiv .name {
   width: 100%;
   height: 20%;
@@ -152,7 +165,6 @@ div .endpointContent .endpointDiv .name {
   text-overflow: ellipsis;
   overflow: hidden;
 }
-
 div .endpointContent .endpointDiv .value {
   width: 100%;
   height: 50%;
@@ -166,24 +178,45 @@ div .endpointContent .endpointDiv .value {
   text-overflow: ellipsis;
   overflow: hidden;
 }
-
 div .endpointContent .endpointDiv .value .currentValue {
   font-size: 25px;
 }
-
 div .endpointContent .endpointDiv .value .currentUnit {
   text-align: right;
   font-size: 10px;
 }
-
 div .endpointContent .btnGroup {
   width: 100%;
   height: 20%;
 }
-
 div .endpointContent .btnGroup .md-icon {
   width: 20px !important;
   height: 20px !important;
   font-size: 20px !important;
 }
+
+/* div .endpointContent .endpointDiv .typeInfo {
+  width: 100%;
+  height: 30%;
+}
+
+div .endpointContent .endpointDiv .typeInfo .type,
+div .endpointContent .endpointDiv .typeInfo .reference {
+  width: 100%;
+  height: 50%;
+}
+
+div .endpointContent .endpointDiv .typeInfo .type .md-icon,
+div .endpointContent .endpointDiv .typeInfo .reference .md-icon {
+  width: 20%;
+}
+
+div .endpointContent .endpointDiv .typeInfo .type span,
+div .endpointContent .endpointDiv .typeInfo .reference span {
+  width: 80%;
+  color: #f68204;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+} */
 </style>
