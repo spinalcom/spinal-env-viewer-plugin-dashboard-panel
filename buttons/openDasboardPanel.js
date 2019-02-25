@@ -14,8 +14,16 @@ import {
   dashboardVariables
 } from "spinal-env-viewer-dashboard-standard-service";
 
-let hasEndPoint = "hasEndPoint";
+import {
+  SpinalBmsEndpoint,
+  SpinalBmsDevice,
+  SpinalBmsEndpointGroup
+} from "spinal-model-bmsnetwork";
 
+let hasEndPoint = "hasEndPoint";
+let types = [SpinalBmsDevice.nodeTypeName, SpinalBmsEndpoint.nodeTypeName,
+  SpinalBmsEndpointGroup
+]
 // import { Spina } from 'spinal-model-bmsNetwork';
 
 class OpenDashboardPanel extends SpinalContextApp {
@@ -31,7 +39,9 @@ class OpenDashboardPanel extends SpinalContextApp {
   isShown(option) {
     return SpinalGraphService.getChildren(option.selectedNode.id.get(),
       [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint]).then(el => {
-      if (el.length > 0) return true;
+      let type = option.selectedNode.type.get();
+
+      if (el.length > 0 || types.indexOf(type) !== -1) return true;
       return -1;
     })
   }

@@ -36,7 +36,7 @@ import {
   SpinalBmsEndpointGroup
 } from "spinal-model-bmsnetwork";
 
-import geographicService from "spinal-env-viewer-context-geographic-service";
+// import geographicService from "spinal-env-viewer-context-geographic-service";
 
 const MAX_PER_LINE = 5;
 const MIN_PER_LINE = 1;
@@ -54,23 +54,25 @@ export default {
   methods: {
     opened(option, viewer) {
       console.log(viewer);
-      this.getEndpointsNode(option).then(el => {
-        this.endpointsNode = el;
+      Promise.all(this.getEndpointsNode(option)).then(el => {
+        this.endpointsNode = el[0]
+          .concat(el[1])
+          .filter(el => typeof el !== "undefined");
       });
     },
     closed() {},
     getEndpointsNode(node) {
-      if (node.type.get() !== geographicService.constants.EQUIPMENT_TYPE) {
-        return SpinalGraphService.getChildren(node.id.get(), [
+      return [
+        SpinalGraphService.getChildren(node.id.get(), [
           dashboardVariables.ENDPOINT_RELATION_NAME
         ]).then(el => {
           return el;
-        });
-      } else {
-        return find(
+        }),
+        find(
           node.id.get(),
           [
             "hasEndPoint",
+            // dashboardVariables.ENDPOINT_RELATION_NAME,
             SpinalBmsDevice.relationName,
             SpinalBmsEndpoint.relationName,
             SpinalBmsEndpointGroup.relationName
@@ -78,8 +80,30 @@ export default {
           el => {
             return el.type.get() === SpinalBmsEndpoint.nodeTypeName;
           }
-        );
-      }
+        )
+      ];
+
+      // if (node.type.get() !== geographicService.constants.EQUIPMENT_TYPE) {
+      //   return SpinalGraphService.getChildren(node.id.get(), [
+      //     dashboardVariables.ENDPOINT_RELATION_NAME
+      //   ]).then(el => {
+      //     return el;
+      //   });
+      // } else {
+      // return find(
+      //   node.id.get(),
+      //   [
+      //     "hasEndPoint",
+      //     dashboardVariables.ENDPOINT_RELATION_NAME,
+      //     SpinalBmsDevice.relationName,
+      //     SpinalBmsEndpoint.relationName,
+      //     SpinalBmsEndpointGroup.relationName
+      //   ],
+      //   el => {
+      //     return el.type.get() === SpinalBmsEndpoint.nodeTypeName;
+      //   }
+      // );
+      // }
     },
     selectNode(node) {
       this.endpointSelected = node;
