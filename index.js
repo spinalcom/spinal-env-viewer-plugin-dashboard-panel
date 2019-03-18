@@ -13,7 +13,7 @@ const {
 
 
 
-spinalContextMenuService.registerApp(sidebarName, new OpenDasboardPanel());
+spinalContextMenuService.registerApp(sidebarName, new OpenDasboardPanel(), [7]);
 
 
 
