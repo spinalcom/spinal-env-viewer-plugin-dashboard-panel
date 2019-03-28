@@ -7,7 +7,8 @@ const {
 } = require("spinal-env-viewer-panel-manager-service");
 
 import {
-  SpinalGraphService
+  SpinalGraphService,
+  SpinalNode
 } from "spinal-env-viewer-graph-service";
 
 import {
@@ -19,6 +20,7 @@ import {
   SpinalBmsDevice,
   SpinalBmsEndpointGroup
 } from "spinal-model-bmsnetwork";
+// import SpinalNode from "spinal-model-graph/build/Nodes/SpinalNode";
 
 let hasEndPoint = "hasEndPoint";
 let types = [SpinalBmsDevice.nodeTypeName, SpinalBmsEndpoint.nodeTypeName,
@@ -37,19 +39,38 @@ class OpenDashboardPanel extends SpinalContextApp {
   }
 
   isShown(option) {
-    return SpinalGraphService.getChildren(option.selectedNode.id.get(),
-      [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint]).then(el => {
-      let type = option.selectedNode.type.get();
+    if (option.exist || option.selectedNode) {
+      let selectedNode = option.selectedNode;
 
-      if (el.length > 0 || types.indexOf(type) !== -1) return true;
-      return -1;
-    })
+      if (option.selectedNode instanceof SpinalNode) {
+        SpinalGraphService._addNode(option.selectedNode);
+        selectedNode = SpinalGraphService.getInfo(option.selectedNode
+          .getId());
+      }
+      return SpinalGraphService.getChildren(selectedNode.id.get(),
+        [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint]).then(
+        el => {
+          let type = selectedNode.type.get();
+
+          if (el.length > 0 || types.indexOf(type) !== -1) return true;
+          return -1;
+        })
+    } else {
+      return Promise.resolve(-1);
+    }
+
   }
 
   action(option) {
+    let selectedNode = option.selectedNode;
+    if (option.selectedNode instanceof SpinalNode) {
+      SpinalGraphService._addNode(option.selectedNode);
+      selectedNode = SpinalGraphService.getInfo(option.selectedNode.getId());
+    }
+
     spinalPanelManagerService.openPanel(
       "spinal_dashboard_panel",
-      option.selectedNode
+      selectedNode
     );
   }
 }
