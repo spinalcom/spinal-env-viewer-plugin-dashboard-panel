@@ -3,6 +3,7 @@ import dashboardPanel from "./vue/dashboardPanel.vue";
 import OpenDasboardPanel from "./buttons/openDasboardPanel";
 
 const sidebarName = "GraphManagerSideBar";
+const circularMenuHookname = "circularMenu";
 const {
   SpinalForgeExtention
 } = require("spinal-env-viewer-panel-manager-service_spinalforgeextention");
@@ -14,7 +15,8 @@ const {
 
 
 spinalContextMenuService.registerApp(sidebarName, new OpenDasboardPanel(), [7]);
-
+spinalContextMenuService.registerApp(circularMenuHookname,
+  new OpenDasboardPanel(), [7]);
 
 
 /*** Register Panel */
