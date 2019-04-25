@@ -1,4 +1,3 @@
-
 <template>
   <div @click="selectEndpoint"
        :class=" {'endpointContent' : true, endpointSelected : isSelected()}"
@@ -59,6 +58,11 @@ export default {
         title: "open Graph Panel",
         clickMethod: this.openGraphPanel,
         iconName: "pie_chart"
+      },
+      {
+        title: "config threshold",
+        clickMethod: this.configThreshold,
+        iconName: "low_priority"
       }
     ];
 
@@ -116,6 +120,12 @@ export default {
       spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
         selectedNode: this.endpointNode
       });
+    },
+    configThreshold() {
+      spinalPanelManagerService.openPanel(
+        "thresholdConfigDialog",
+        this.endpointNode
+      );
     }
   },
   watch: {
