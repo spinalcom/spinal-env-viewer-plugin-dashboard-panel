@@ -48,7 +48,7 @@ let find = async function(id, relationNames, predicate) {
   }
 
   return found;
-}
+};
 
 export {
   find
