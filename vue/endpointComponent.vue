@@ -34,7 +34,7 @@
                    class="md-icon-button md-dense"
                    :title="icon.title"
                    @click="icon.clickMethod">
-          <md-icon>
+          <md-icon class="endpointIcons">
             {{icon.iconName}}
           </md-icon>
         </md-button>
@@ -199,34 +199,12 @@ div .endpointContent .btnGroup {
   width: 100%;
   height: 20%;
 }
+
 div .endpointContent .btnGroup .md-icon {
   width: 20px !important;
   height: 20px !important;
   font-size: 20px !important;
+  /* background: red; */
+  margin-left: -13px;
 }
-
-/* div .endpointContent .endpointDiv .typeInfo {
-  width: 100%;
-  height: 30%;
-}
-
-div .endpointContent .endpointDiv .typeInfo .type,
-div .endpointContent .endpointDiv .typeInfo .reference {
-  width: 100%;
-  height: 50%;
-}
-
-div .endpointContent .endpointDiv .typeInfo .type .md-icon,
-div .endpointContent .endpointDiv .typeInfo .reference .md-icon {
-  width: 20%;
-}
-
-div .endpointContent .endpointDiv .typeInfo .type span,
-div .endpointContent .endpointDiv .typeInfo .reference span {
-  width: 80%;
-  color: #f68204;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-} */
 </style>
