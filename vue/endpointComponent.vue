@@ -28,7 +28,8 @@
         </div>
       </div> -->
 
-      <div class="btnGroup">
+      <div class="btnGroup"
+           v-if="iconsItems.length <= 2">
         <md-button v-for="icon in iconsItems"
                    :key="icon.iconName"
                    class="md-icon-button md-dense"
@@ -38,6 +39,34 @@
             {{icon.iconName}}
           </md-icon>
         </md-button>
+      </div>
+
+      <div class="menuBtn"
+           v-else>
+        <md-menu md-size="medium"
+                 :md-offset-x="127"
+                 :md-offset-y="-36">
+          <md-button class="md-icon-button md-dense"
+                     title="open"
+                     md-menu-trigger>
+            <md-icon class="endpointIcons"> more_vert </md-icon>
+          </md-button>
+
+          <md-menu-content>
+            <md-menu-item v-for="icon in iconsItems"
+                          :key="icon.iconName"
+                          @click="icon.clickMethod">
+              <p>
+                <md-icon class="endpointIcons">
+                  {{icon.iconName}}
+                </md-icon>
+                &nbsp;
+                {{icon.title}}
+              </p>
+            </md-menu-item>
+          </md-menu-content>
+
+        </md-menu>
       </div>
     </div>
 
@@ -195,16 +224,24 @@ div .endpointContent .endpointDiv .value .currentUnit {
   text-align: right;
   font-size: 10px;
 }
+
 div .endpointContent .btnGroup {
   width: 100%;
   height: 20%;
 }
 
-div .endpointContent .btnGroup .md-icon {
+div .endpointContent .menuBtn {
+  width: 100%;
+  height: 20%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+div .endpointContent .btnGroup .md-icon,
+div .endpointContent .menuBtn .md-icon {
   width: 20px !important;
   height: 20px !important;
   font-size: 20px !important;
-  /* background: red; */
   margin-left: -13px;
 }
 </style>
