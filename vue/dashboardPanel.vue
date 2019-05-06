@@ -38,6 +38,10 @@ import {
 
 // import geographicService from "spinal-env-viewer-context-geographic-service";
 
+const {
+  spinalPanelManagerService
+} = require("spinal-env-viewer-panel-manager-service");
+
 const MAX_PER_LINE = 5;
 const MIN_PER_LINE = 1;
 
@@ -52,8 +56,8 @@ export default {
     };
   },
   methods: {
-    opened(option, viewer) {
-      console.log(viewer);
+    opened(option) {
+      this.setTitle(option.name.get());
       Promise.all(this.getEndpointsNode(option)).then(el => {
         this.endpointsNode = el[0]
           .concat(el[1])
@@ -114,6 +118,12 @@ export default {
       } else if (name == "-1" && this.itemCountPerLine > MIN_PER_LINE) {
         this.itemCountPerLine -= 1;
       }
+    },
+
+    setTitle(title) {
+      spinalPanelManagerService.panels.spinal_dashboard_panel.panel.setTitle(
+        `Dashboard : ${title}`
+      );
     }
   },
   computed: {
@@ -126,8 +136,8 @@ export default {
 
 <style scoped>
 .dashboardPanelContent {
-  width: calc(100%);
-  height: calc(100%);
+  width: 100%;
+  height: 100%;
 }
 .dash_sidebar {
   border-bottom: 1px solid white;

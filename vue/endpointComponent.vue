@@ -30,6 +30,17 @@
 
       <div class="btnGroup"
            v-if="iconsItems.length <= 2">
+
+        <!-- Alarm Icon -->
+        <md-button class="md-icon-button md-dense "
+                   title="Alarm"
+                   @click="seeAlarm">
+          <md-icon class="endpointIcons alarmBtn">
+            error_outline
+          </md-icon>
+        </md-button>
+        <!-- Alarm Icon -->
+
         <md-button v-for="icon in iconsItems"
                    :key="icon.iconName"
                    class="md-icon-button md-dense"
@@ -43,6 +54,17 @@
 
       <div class="menuBtn"
            v-else>
+
+        <!-- Alarm Icon -->
+        <md-button class="md-icon-button md-dense"
+                   title="Alarm"
+                   @click="seeAlarm">
+          <md-icon class="endpointIcons alarmBtn">
+            error_outline
+          </md-icon>
+        </md-button>
+        <!-- Alarm Icon -->
+
         <md-menu md-size="medium"
                  :md-offset-x="127"
                  :md-offset-y="-36">
@@ -78,8 +100,13 @@ const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
+// import alarmButton from "./alarmBtn.vue";
+
 export default {
   name: "endpointComponent",
+  // components: {
+  //   "alarm-button": alarmButton
+  // },
   props: ["endpointNode", "endpointSelected", "itemCount"],
   data() {
     this.iconsItems = [
@@ -155,7 +182,9 @@ export default {
         "thresholdConfigDialog",
         this.endpointNode
       );
-    }
+    },
+
+    seeAlarm() {}
   },
   watch: {
     endpointNode: function() {
@@ -244,4 +273,19 @@ div .endpointContent .menuBtn .md-icon {
   font-size: 20px !important;
   margin-left: -13px;
 }
+
+div .endpointContent .btnGroup .md-icon.alarmBtn,
+div .endpointContent .menuBtn .md-icon.alarmBtn {
+  color: red;
+}
+
+/* .alarmBtn {
+  color: red;
+} */
+
+/*
+div .endpointContent .btnGroup .md-icon i,
+div .endpointContent .menuBtn .md-icon i {
+  color: red;
+} */
 </style>

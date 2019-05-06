@@ -30,6 +30,7 @@ const dashboardExtension = SpinalForgeExtention.createExtention({
     closeBehaviour: "hide"
   },
   style: {
+    "min-width": "460px",
     left: "400px"
   }
 });
