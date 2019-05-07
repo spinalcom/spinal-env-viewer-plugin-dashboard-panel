@@ -183,7 +183,6 @@ export default {
         this.endpointNode
       );
     },
-
     seeAlarm() {}
   },
   watch: {
