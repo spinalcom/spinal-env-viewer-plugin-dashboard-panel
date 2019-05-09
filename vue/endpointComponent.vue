@@ -34,7 +34,7 @@
         <!-- Alarm Icon -->
         <md-button class="md-icon-button md-dense "
                    title="Alarm"
-                   @click="seeAlarm">
+                   @click="seeAlarm(endpoint)">
           <md-icon class="endpointIcons alarmBtn">
             error_outline
           </md-icon>
@@ -183,7 +183,12 @@ export default {
         this.endpointNode
       );
     },
-    seeAlarm() {}
+    seeAlarm() {
+      spinalPanelManagerService.openPanel(
+        "spinal_alarm_panel",
+        this.endpointNode
+      );
+    }
   },
   watch: {
     endpointNode: function() {
@@ -273,18 +278,8 @@ div .endpointContent .menuBtn .md-icon {
   margin-left: -13px;
 }
 
-div .endpointContent .btnGroup .md-icon.alarmBtn,
+/* div .endpointContent .btnGroup .md-icon.alarmBtn,
 div .endpointContent .menuBtn .md-icon.alarmBtn {
-  color: red;
-}
-
-/* .alarmBtn {
-  color: red;
-} */
-
-/*
-div .endpointContent .btnGroup .md-icon i,
-div .endpointContent .menuBtn .md-icon i {
   color: red;
 } */
 </style>
