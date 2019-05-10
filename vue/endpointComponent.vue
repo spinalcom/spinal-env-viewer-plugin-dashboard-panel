@@ -96,9 +96,13 @@
 </template>
 
 <script>
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
+
+import geographicService from "spinal-env-viewer-context-geographic-service";
+import { setTimeout, clearTimeout } from "timers";
 
 // import alarmButton from "./alarmBtn.vue";
 
@@ -107,8 +111,11 @@ export default {
   // components: {
   //   "alarm-button": alarmButton
   // },
-  props: ["endpointNode", "endpointSelected", "itemCount"],
+  props: ["endpointNode", "endpointSelected", "itemCount", "viewer"],
   data() {
+    this.click = 0;
+    this.timer;
+
     this.iconsItems = [
       {
         title: "open Graph Panel",
@@ -184,10 +191,104 @@ export default {
       );
     },
     seeAlarm() {
-      spinalPanelManagerService.openPanel(
-        "spinal_alarm_panel",
-        this.endpointNode
-      );
+      this.click++;
+
+      if (this.click === 1) {
+        this.timer = setTimeout(() => {
+          this.selectBimObject();
+          this.click = 0;
+        }, 500);
+      } else if (this.click === 2) {
+        clearTimeout(this.timer);
+        spinalPanelManagerService.openPanel(
+          "spinal_alarm_panel",
+          this.endpointNode
+        );
+        this.click = 0;
+      }
+    },
+    getParents() {
+      let relationName = "hasEndPoint";
+      let dashEndpointRelation = "hasDashEndpoint";
+
+      let node = SpinalGraphService.getRealNode(this.endpointNode.id.get());
+
+      let linkRelation = node.parents[relationName];
+      let dashRelation = node.parents[dashEndpointRelation];
+
+      let relationLst = [];
+
+      if (
+        typeof linkRelation !== "undefined" &&
+        typeof dashRelation !== "undefined"
+      ) {
+        relationLst = [...linkRelation, ...dashRelation];
+      } else if (
+        typeof linkRelation === "undefined" &&
+        typeof dashRelation !== "undefined"
+      ) {
+        relationLst = [...dashRelation];
+      } else if (
+        typeof linkRelation !== "undefined" &&
+        typeof dashRelation === "undefined"
+      ) {
+        relationLst = [...linkRelation];
+      }
+
+      if (relationLst.length) {
+        relationLst = relationLst.map(el => {
+          return el.load();
+        });
+
+        return Promise.all(relationLst).then(res => {
+          res = res.map(el => {
+            return el.parent.load();
+          });
+
+          return Promise.all(res).then(parents => {
+            return parents.map(el => {
+              return SpinalGraphService.getInfo(el.info.id.get());
+            });
+          });
+        });
+      } else {
+        return;
+      }
+    },
+    getBimObjectsId(nodeId) {
+      let realNode = SpinalGraphService.getRealNode(nodeId);
+
+      return realNode
+        .find(geographicService.constants.GEOGRAPHIC_RELATIONS, node => {
+          if (
+            node.info.type.get() === geographicService.constants.EQUIPMENT_TYPE
+          ) {
+            return true;
+          }
+        })
+        .then(bimNode => {
+          return bimNode.map(el => {
+            return el.info.dbid.get();
+          });
+        });
+    },
+    selectBimObject() {
+      this.getParents().then(parents => {
+        parents = parents.map(el => {
+          return this.getBimObjectsId(el.id.get());
+        });
+
+        Promise.all(parents).then(values => {
+          let dbIds = [];
+
+          for (let i = 0; i < values.length; i++) {
+            const element = values[i];
+            dbIds = [...element];
+          }
+
+          this.viewer.select(dbIds);
+        });
+      });
     }
   },
   watch: {

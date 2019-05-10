@@ -20,7 +20,8 @@
                           :endpointNode="endpoint"
                           @selectEndpoint="selectNode(endpoint)"
                           :endpointSelected="endpointSelected"
-                          :itemCount="itemCountPerLine"></endpoint-component>
+                          :itemCount="itemCountPerLine"
+                          :viewer="viewer"></endpoint-component>
     </md-content>
   </div>
 </template>
@@ -49,6 +50,7 @@ export default {
   name: "dashboard-panel",
   components: { endpointComponent },
   data() {
+    this.viewer;
     return {
       endpointsNode: null,
       endpointSelected: null,
@@ -56,7 +58,8 @@ export default {
     };
   },
   methods: {
-    opened(option) {
+    opened(option, viewer) {
+      this.viewer = viewer;
       this.setTitle(option.name.get());
       Promise.all(this.getEndpointsNode(option)).then(el => {
         this.endpointsNode = el[0]
