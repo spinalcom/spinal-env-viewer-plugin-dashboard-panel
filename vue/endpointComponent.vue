@@ -200,10 +200,10 @@ export default {
         }, 500);
       } else if (this.click === 2) {
         clearTimeout(this.timer);
-        spinalPanelManagerService.openPanel(
-          "spinal_alarm_panel",
-          this.endpointNode
-        );
+        spinalPanelManagerService.openPanel("spinal_alarm_panel", {
+          endpointNode: this.endpointNode,
+          dbIs: this.getAllDbIds()
+        });
         this.click = 0;
       }
     },
@@ -272,13 +272,13 @@ export default {
           });
         });
     },
-    selectBimObject() {
-      this.getParents().then(parents => {
+    getAllDbIds() {
+      return this.getParents().then(parents => {
         parents = parents.map(el => {
           return this.getBimObjectsId(el.id.get());
         });
 
-        Promise.all(parents).then(values => {
+        return Promise.all(parents).then(values => {
           let dbIds = [];
 
           for (let i = 0; i < values.length; i++) {
@@ -286,8 +286,14 @@ export default {
             dbIds = [...element];
           }
 
-          this.viewer.select(dbIds);
+          return dbIds;
         });
+      });
+    },
+
+    selectBimObject() {
+      this.getAllDbIds().then(dbIds => {
+        this.viewer.select(dbIds);
       });
     }
   },
