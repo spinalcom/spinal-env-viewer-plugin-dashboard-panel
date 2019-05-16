@@ -35,7 +35,8 @@
         <md-button class="md-icon-button md-dense "
                    title="Alarm"
                    @click="seeAlarm(endpoint)">
-          <md-icon class="endpointIcons alarmBtn">
+          <md-icon class="endpointIcons"
+                   :class="{'alarmBtn' : isInAlarm}">
             error_outline
           </md-icon>
         </md-button>
@@ -59,7 +60,8 @@
         <md-button class="md-icon-button md-dense"
                    title="Alarm"
                    @click="seeAlarm">
-          <md-icon class="endpointIcons alarmBtn">
+          <md-icon class="endpointIcons"
+                   :class="{'alarmBtn' : isInAlarm}">
             error_outline
           </md-icon>
         </md-button>
@@ -96,15 +98,18 @@
 </template>
 
 <script>
-import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+// import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
-import geographicService from "spinal-env-viewer-context-geographic-service";
+// import geographicService from "spinal-env-viewer-context-geographic-service";
 import { setTimeout, clearTimeout } from "timers";
+import { alarmService } from "../../spinal-organ-threshold/dist";
 
 // import alarmButton from "./alarmBtn.vue";
+
+import { utilities } from "../alarm_manager/utilities";
 
 export default {
   name: "endpointComponent",
@@ -202,97 +207,14 @@ export default {
         clearTimeout(this.timer);
         spinalPanelManagerService.openPanel("spinal_alarm_panel", {
           endpointNode: this.endpointNode,
-          dbIs: this.getAllDbIds()
+          dbIs: utilities.getAllDbIds(this.endpointNode.id.get())
         });
         this.click = 0;
       }
     },
-    getParents() {
-      let relationName = "hasEndPoint";
-      let dashEndpointRelation = "hasDashEndpoint";
-
-      let node = SpinalGraphService.getRealNode(this.endpointNode.id.get());
-
-      let linkRelation = node.parents[relationName];
-      let dashRelation = node.parents[dashEndpointRelation];
-
-      let relationLst = [];
-
-      if (
-        typeof linkRelation !== "undefined" &&
-        typeof dashRelation !== "undefined"
-      ) {
-        relationLst = [...linkRelation, ...dashRelation];
-      } else if (
-        typeof linkRelation === "undefined" &&
-        typeof dashRelation !== "undefined"
-      ) {
-        relationLst = [...dashRelation];
-      } else if (
-        typeof linkRelation !== "undefined" &&
-        typeof dashRelation === "undefined"
-      ) {
-        relationLst = [...linkRelation];
-      }
-
-      if (relationLst.length) {
-        relationLst = relationLst.map(el => {
-          return el.load();
-        });
-
-        return Promise.all(relationLst).then(res => {
-          res = res.map(el => {
-            return el.parent.load();
-          });
-
-          return Promise.all(res).then(parents => {
-            return parents.map(el => {
-              return SpinalGraphService.getInfo(el.info.id.get());
-            });
-          });
-        });
-      } else {
-        return;
-      }
-    },
-    getBimObjectsId(nodeId) {
-      let realNode = SpinalGraphService.getRealNode(nodeId);
-
-      return realNode
-        .find(geographicService.constants.GEOGRAPHIC_RELATIONS, node => {
-          if (
-            node.info.type.get() === geographicService.constants.EQUIPMENT_TYPE
-          ) {
-            return true;
-          }
-        })
-        .then(bimNode => {
-          return bimNode.map(el => {
-            return el.info.dbid.get();
-          });
-        });
-    },
-    getAllDbIds() {
-      return this.getParents().then(parents => {
-        parents = parents.map(el => {
-          return this.getBimObjectsId(el.id.get());
-        });
-
-        return Promise.all(parents).then(values => {
-          let dbIds = [];
-
-          for (let i = 0; i < values.length; i++) {
-            const element = values[i];
-            dbIds = [...element];
-          }
-
-          return dbIds;
-        });
-      });
-    },
 
     selectBimObject() {
-      this.getAllDbIds().then(dbIds => {
+      utilities.getAllDbIds(this.endpointNode.id.get()).then(dbIds => {
         this.viewer.select(dbIds);
       });
     }
@@ -308,6 +230,10 @@ export default {
       return {
         width: `calc(100% / ${this.itemCount} - 24px)`
       };
+    },
+    isInAlarm() {
+      console.log("hello world");
+      return alarmService.isInAlarm(this.endpointNode.id.get());
     }
   }
 };
@@ -385,8 +311,8 @@ div .endpointContent .menuBtn .md-icon {
   margin-left: -13px;
 }
 
-/* div .endpointContent .btnGroup .md-icon.alarmBtn,
+div .endpointContent .btnGroup .md-icon.alarmBtn,
 div .endpointContent .menuBtn .md-icon.alarmBtn {
   color: red;
-} */
+}
 </style>

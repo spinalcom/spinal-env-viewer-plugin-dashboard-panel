@@ -37,3 +37,6 @@ const dashboardExtension = SpinalForgeExtention.createExtention({
 
 SpinalForgeExtention.registerExtention("spinal_dashboard_panel",
   dashboardExtension);
+
+
+import "./alarm_manager/bindEndpoint";
