@@ -63,9 +63,9 @@ let utilities = {
 
     return this.getRealNode(nodeId).then(node => {
 
-
       let linkRelation = node.parents[relationName];
       let dashRelation = node.parents[dashEndpointRelation];
+
 
       let relationLst = [];
 
@@ -74,15 +74,18 @@ let utilities = {
         typeof dashRelation !== "undefined"
       ) {
         relationLst = [...linkRelation, ...dashRelation];
+
       } else if (
         typeof linkRelation === "undefined" &&
         typeof dashRelation !== "undefined"
       ) {
+
         relationLst = [...dashRelation];
       } else if (
         typeof linkRelation !== "undefined" &&
         typeof dashRelation === "undefined"
       ) {
+
         relationLst = [...linkRelation];
       }
 
@@ -98,6 +101,7 @@ let utilities = {
 
           return Promise.all(res).then(parents => {
             return parents.map(el => {
+              SpinalGraphService._addNode(el);
               return SpinalGraphService.getInfo(el.info.id
                 .get());
             });
