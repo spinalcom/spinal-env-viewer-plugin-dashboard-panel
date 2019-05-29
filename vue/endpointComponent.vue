@@ -105,7 +105,7 @@ const {
 
 // import geographicService from "spinal-env-viewer-context-geographic-service";
 import { setTimeout, clearTimeout } from "timers";
-import { alarmService } from "../../spinal-organ-threshold/dist";
+import { alarmService } from "spinal-organ-threshold/dist";
 
 // import alarmButton from "./alarmBtn.vue";
 
