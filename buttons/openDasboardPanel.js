@@ -28,6 +28,8 @@ let types = [SpinalBmsDevice.nodeTypeName, SpinalBmsEndpoint.nodeTypeName,
 ]
 // import { Spina } from 'spinal-model-bmsNetwork';
 
+import {spinalControlPointService} from "spinal-env-viewer-plugin-control-endpoint-service"
+
 class OpenDashboardPanel extends SpinalContextApp {
   constructor() {
     super("open in dashboard panel", "open dashboard", {
@@ -48,7 +50,7 @@ class OpenDashboardPanel extends SpinalContextApp {
           .getId());
       }
       return SpinalGraphService.getChildren(selectedNode.id.get(),
-        [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint]).then(
+        [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint, spinalControlPointService.ROOM_TO_CONTROL_GROUP]).then(
         el => {
           let type = selectedNode.type.get();
 
