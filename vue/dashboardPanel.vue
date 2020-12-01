@@ -37,6 +37,8 @@ import {
   SpinalBmsEndpointGroup
 } from "spinal-model-bmsnetwork";
 
+import {spinalControlPointService} from "spinal-env-viewer-plugin-control-endpoint-service"
+
 // import geographicService from "spinal-env-viewer-context-geographic-service";
 
 const {
@@ -82,7 +84,8 @@ export default {
             // dashboardVariables.ENDPOINT_RELATION_NAME,
             SpinalBmsDevice.relationName,
             SpinalBmsEndpoint.relationName,
-            SpinalBmsEndpointGroup.relationName
+            SpinalBmsEndpointGroup.relationName,
+            spinalControlPointService.ROOM_TO_CONTROL_GROUP
           ],
           el => {
             return el.type.get() === SpinalBmsEndpoint.nodeTypeName;
