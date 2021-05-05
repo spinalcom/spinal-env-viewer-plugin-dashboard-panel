@@ -1,34 +1,11 @@
-const {
-  SpinalContextApp
-} = require("spinal-env-viewer-context-menu-service");
+const { SpinalContextApp } = require("spinal-env-viewer-context-menu-service");
+const { spinalPanelManagerService } = require("spinal-env-viewer-panel-manager-service");
 
-const {
-  spinalPanelManagerService
-} = require("spinal-env-viewer-panel-manager-service");
+import { SpinalGraphService, SpinalNode } from "spinal-env-viewer-graph-service";
 
-import {
-  SpinalGraphService,
-  SpinalNode
-} from "spinal-env-viewer-graph-service";
+import { TYPES, RELATION_NAMES } from "../js/constants";
 
-import {
-  dashboardVariables
-} from "spinal-env-viewer-dashboard-standard-service";
 
-import {
-  SpinalBmsEndpoint,
-  SpinalBmsDevice,
-  SpinalBmsEndpointGroup
-} from "spinal-model-bmsnetwork";
-// import SpinalNode from "spinal-model-graph/build/Nodes/SpinalNode";
-
-let hasEndPoint = "hasEndPoint";
-let types = [SpinalBmsDevice.nodeTypeName, SpinalBmsEndpoint.nodeTypeName,
-  SpinalBmsEndpointGroup
-]
-// import { Spina } from 'spinal-model-bmsNetwork';
-
-import {spinalControlPointService} from "spinal-env-viewer-plugin-control-endpoint-service"
 
 class OpenDashboardPanel extends SpinalContextApp {
   constructor() {
@@ -44,22 +21,24 @@ class OpenDashboardPanel extends SpinalContextApp {
     if (option.exist || option.selectedNode) {
       let selectedNode = option.selectedNode;
 
-      if (option.selectedNode instanceof SpinalNode) {
-        SpinalGraphService._addNode(option.selectedNode);
-        selectedNode = SpinalGraphService.getInfo(option.selectedNode
-          .getId());
+      if (!(option.selectedNode instanceof SpinalNode)) {
+        // SpinalGraphService._addNode(option.selectedNode);
+        selectedNode = SpinalGraphService.getRealNode(option.selectedNode.id.get());
       }
-      return SpinalGraphService.getChildren(selectedNode.id.get(),
-        [dashboardVariables.ENDPOINT_RELATION_NAME, hasEndPoint, spinalControlPointService.ROOM_TO_CONTROL_GROUP]).then(
-        el => {
-          let type = selectedNode.type.get();
 
-          if (el.length > 0 || types.indexOf(type) !== -1) return true;
-          return -1;
-        })
-    } else {
-      return Promise.resolve(-1);
+      const selectType = selectedNode.getType().get();
+
+      if (TYPES.indexOf(selectType) !== -1) {
+        return Promise.resolve(true);
+      }
+
+      const nodeRelations = selectedNode.getRelationNames();
+
+      const found = nodeRelations.find(el => RELATION_NAMES.indexOf(el) !== -1);
+
+      return Promise.resolve(found ? true : -1);
     }
+
 
   }
 
