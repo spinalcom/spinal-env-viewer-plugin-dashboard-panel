@@ -22,24 +22,9 @@
             <div class="currentUnit">{{endpoint.unit}}</div>
          </div>
 
-         <!-- <div class="typeInfo">
-        <div class="type"
-             v-tooltip="'type : ' + endpoint.type">
-          <md-icon>category</md-icon>
-          <span>{{endpoint.type}}</span>
-        </div>
-        <div class="reference"
-             v-tooltip="'Reference : ' + endpoint.type"
-             v-if="endpoint.ref">
-          <md-icon>link</md-icon>
-          <span>{{endpoint.ref}}</span>
-        </div>
-      </div> -->
+         <!-- v-if="iconsItems.length <= 2" -->
 
-         <div
-            class="btnGroup"
-            v-if="iconsItems.length <= 2"
-         >
+         <div class="btnGroup">
 
             <!-- Alarm Icon -->
             <md-button
@@ -67,83 +52,39 @@
                   {{icon.iconName}}
                </md-icon>
             </md-button>
+
+            <popover-component
+               :endpoint="endpoint"
+               :endpointElement="endpointElement"
+               :endpointNode="endpointNode"
+            ></popover-component>
+
          </div>
 
-         <div
-            class="menuBtn"
-            v-else
-         >
-
-            <!-- Alarm Icon -->
-            <!-- @click="seeAlarm" -->
-            <md-button
-               class="md-icon-button md-dense"
-               title="Alarm"
-            >
-               <md-icon
-                  class="endpointIcons"
-                  :class="{'alarmBtn' : isInAlarm}"
-               >
-                  error_outline
-               </md-icon>
-            </md-button>
-            <!-- Alarm Icon -->
-
-            <md-menu
-               md-size="medium"
-               :md-offset-x="127"
-               :md-offset-y="-36"
-            >
-               <md-button
-                  class="md-icon-button md-dense"
-                  title="open"
-                  md-menu-trigger
-               >
-                  <md-icon class="endpointIcons"> more_vert </md-icon>
-               </md-button>
-
-               <md-menu-content>
-                  <md-menu-item
-                     v-for="icon in iconsItems"
-                     :key="icon.iconName"
-                     @click="icon.clickMethod"
-                  >
-                     <p>
-                        <md-icon class="endpointIcons">
-                           {{icon.iconName}}
-                        </md-icon>
-                        &nbsp;
-                        {{icon.title}}
-                     </p>
-                  </md-menu-item>
-               </md-menu-content>
-
-            </md-menu>
-         </div>
       </div>
 
    </div>
 </template>
 
 <script>
-// import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 const {
    spinalPanelManagerService,
 } = require("spinal-env-viewer-panel-manager-service");
 
-// import geographicService from "spinal-env-viewer-context-geographic-service";
+import VTooltip from "v-tooltip";
+
 import { setTimeout, clearTimeout } from "timers";
 import { alarmService } from "spinal-organ-threshold/dist";
+import PopoverComponent from "./popover/popover.vue";
 
-// import alarmButton from "./alarmBtn.vue";
-
-import { utilities } from "../alarm_manager/utilities";
+import { utilities } from "../../alarm_manager/utilities";
 
 export default {
    name: "endpointComponent",
-   // components: {
-   //   "alarm-button": alarmButton
-   // },
+   components: {
+      "v-tooltip": VTooltip,
+      "popover-component": PopoverComponent,
+   },
    props: ["endpointNode", "endpointSelected", "itemCount", "viewer"],
    data() {
       this.click = 0;
@@ -155,11 +96,16 @@ export default {
             clickMethod: this.openGraphPanel,
             iconName: "pie_chart",
          },
-         {
-            title: "config threshold",
-            clickMethod: this.configThreshold,
-            iconName: "low_priority",
-         },
+         // {
+         //    title: "config threshold",
+         //    clickMethod: this.configThreshold,
+         //    iconName: "low_priority",
+         // },
+         // {
+         //    title: "Update Value",
+         //    clickMethod: this.configThreshold,
+         //    iconName: "tune",
+         // },
       ];
 
       return {
@@ -187,9 +133,7 @@ export default {
          endpointToObject["name"] = endpoint.name.get();
          endpointToObject["unit"] = endpoint.unit.get();
          endpointToObject["type"] = endpoint.type.get();
-         endpointToObject["ref"] = endpoint.referenceOf
-            ? endpoint.referenceOf.get()
-            : undefined;
+         endpointToObject["ref"] = endpoint.referenceOf ? endpoint.referenceOf.get() : undefined;
          endpointToObject["currentValue"] = endpoint.currentValue.get();
          return endpointToObject;
       },
@@ -280,16 +224,20 @@ div .endpointContent {
    margin: 4px;
    border: 1px solid;
 }
+
 div .endpointSelected {
    background: #356bab !important;
 }
+
 div .endpointContent:hover {
    cursor: pointer;
 }
+
 div .endpointContent .endpointDiv {
    width: calc(100%);
    height: calc(100%);
 }
+
 div .endpointContent .endpointDiv .name {
    width: 100%;
    height: 20%;
@@ -301,6 +249,7 @@ div .endpointContent .endpointDiv .name {
    text-overflow: ellipsis;
    overflow: hidden;
 }
+
 div .endpointContent .endpointDiv .value {
    width: 100%;
    height: 50%;
@@ -314,9 +263,11 @@ div .endpointContent .endpointDiv .value {
    text-overflow: ellipsis;
    overflow: hidden;
 }
+
 div .endpointContent .endpointDiv .value .currentValue {
    font-size: 25px;
 }
+
 div .endpointContent .endpointDiv .value .currentUnit {
    text-align: right;
    font-size: 10px;
@@ -325,6 +276,7 @@ div .endpointContent .endpointDiv .value .currentUnit {
 div .endpointContent .btnGroup {
    width: 100%;
    height: 20%;
+   display: flex;
 }
 
 div .endpointContent .menuBtn {
@@ -346,4 +298,6 @@ div .endpointContent .btnGroup .md-icon.alarmBtn,
 div .endpointContent .menuBtn .md-icon.alarmBtn {
    color: red;
 }
+
 </style>
+

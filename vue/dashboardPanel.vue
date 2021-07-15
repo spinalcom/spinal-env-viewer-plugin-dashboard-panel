@@ -5,7 +5,7 @@
       :class="{viewerVSix : V6}"
       v-if="endpointsNode"
    >
-      <div class="md-layout dash_sidebar">
+      <!-- <div class="md-layout dash_sidebar">
          <p class="md-layout-item md-size-60 sidebarText">
             NUMBER OF COLUMNS :
             <span>{{itemCountPerLine}}</span>
@@ -19,7 +19,35 @@
             class="md-layout-item md-size-15"
             @click="changeItemCountPerLine('+1')"
          >+1</md-button>
+      </div> -->
+
+      <div class="dash_sidebar">
+         <div class="sidebarText">
+            NUMBER OF COLUMNS :
+            <span>{{itemCountPerLine}}</span>
+         </div>
+
+         <div class="sidebarButtons">
+            <md-button @click="changeItemCountPerLine('-1')">-1</md-button>
+
+            <md-button @click="changeItemCountPerLine('+1')">+1</md-button>
+         </div>
+
       </div>
+
+      <div
+         class="state"
+         v-if="pageSelected === PAGES.normal && endpointsNode.length === 0"
+      >
+         <h3>No endpoint found !</h3>
+      </div>
+
+      <!-- <div
+         v-if="pageSelected === PAGES.normal && endpointsNode.length > 0"
+         class="_endpoint_div_content"
+      >
+         <virtual-scroll></virtual-scroll>
+      </div> -->
 
       <md-content
          class="md-scrollbar _endpoint_div_content"
@@ -35,51 +63,42 @@
             :viewer="viewer"
          ></endpoint-component>
 
-         <div
-            class="state"
-            v-if="endpointsNode.length === 0"
-         >
-            <h3>No endpoint found !</h3>
-         </div>
       </md-content>
 
-      <md-content
+      <div
          class="state"
          v-else-if="pageSelected === PAGES.loading"
       >
          <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
-      </md-content>
+      </div>
 
-      <md-content
+      <div
          class="state"
          v-else-if="pageSelected === PAGES.error"
       >
          <md-icon class="md-size-4x">close</md-icon>
-      </md-content>
+      </div>
    </div>
 </template>
 
 <script>
-import endpointComponent from "./endpointComponent.vue";
+import EndpointComponent from "./components/endpointComponent.vue";
+import VirtualScroll from "./components/virtualScroll.vue";
+
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import { RELATION_NAMES } from "../js/constants";
 import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
-const {
-   spinalPanelManagerService,
-} = require("spinal-env-viewer-panel-manager-service");
-
-// import { spinalControlPointService } from "spinal-env-viewer-plugin-control-endpoint-service";
-// import { dashboardVariables } from "spinal-env-viewer-dashboard-standard-service";
-// import { SpinalBmsEndpoint, SpinalBmsDevice, SpinalBmsEndpointGroup } from "spinal-model-bmsnetwork";
-// import geographicService from "spinal-env-viewer-context-geographic-service";
-// import { find } from "../find";
+const { spinalPanelManagerService } = require("spinal-env-viewer-panel-manager-service");
 
 const MAX_PER_LINE = 5;
 const MIN_PER_LINE = 1;
 
 export default {
    name: "dashboard-panel",
-   components: { endpointComponent },
+   components: {
+      "endpoint-component": EndpointComponent,
+      "virtual-scroll": VirtualScroll,
+   },
    data() {
       this.viewer;
       this.PAGES = {
@@ -108,11 +127,6 @@ export default {
             .catch((err) => {
                this.pageSelected = this.PAGES.error;
             });
-         //  Promise.all(this.getEndpointsNode(option)).then((el) => {
-         //     this.endpointsNode = el[0]
-         //        .concat(el[1])
-         //        .filter((el) => typeof el !== "undefined");
-         //  });
       },
 
       closed() {},
@@ -133,27 +147,6 @@ export default {
                console.log(err);
                return [];
             });
-         //  return [
-         //     SpinalGraphService.getChildren(node.id.get(), [
-         //        dashboardVariables.ENDPOINT_RELATION_NAME,
-         //     ]).then((el) => {
-         //        return el;
-         //     }),
-         //     find(
-         //        node.id.get(),
-         //        [
-         //           "hasEndPoint",
-         //           // dashboardVariables.ENDPOINT_RELATION_NAME,
-         //           SpinalBmsDevice.relationName,
-         //           SpinalBmsEndpoint.relationName,
-         //           SpinalBmsEndpointGroup.relationName,
-         //           spinalControlPointService.ROOM_TO_CONTROL_GROUP,
-         //        ],
-         //        (el) => {
-         //           return el.type.get() === SpinalBmsEndpoint.nodeTypeName;
-         //        }
-         //     ),
-         //  ];
       },
 
       selectNode(node) {
@@ -186,15 +179,19 @@ export default {
 .dashboardPanelContent {
    width: 100%;
    height: 100%;
+   background-color: unset !important;
 }
 
-.dash_sidebar {
-   border-bottom: 1px solid white;
-   margin-bottom: 10px;
+.dashboardPanelContent .dash_sidebar {
+   width: 100%;
    height: 50px;
+   display: flex;
+   justify-content: space-between;
+   /* border-bottom: 1px solid white; */
+   /* margin-bottom: 10px; */
 }
 
-.dash_sidebar .sidebarText {
+.dashboardPanelContent .dash_sidebar .sidebarText {
    padding-left: 5px;
    font-size: 15px;
    height: 100%;
@@ -203,20 +200,20 @@ export default {
    align-items: center;
 }
 
-.dash_sidebar .sidebarText span {
-   color: red;
+.dashboardPanelContent .dash_sidebar .sidebarText span {
    font-size: 20px;
    margin-left: 5px;
    color: #f68204;
 }
 
-._endpoint_div_content {
+.dashboardPanelContent ._endpoint_div_content {
    /* 60px = sidebarHeigth + marginBottom; 5px for hidden panel scrollbar */
+   width: 100%;
    height: calc(100% - 65px);
    overflow: auto;
 }
 
-.state {
+.dashboardPanelContent .state {
    width: 100%;
    height: calc(100% - 65px);
    display: flex;
@@ -224,11 +221,11 @@ export default {
    align-items: center;
 }
 
-.dockingPanelScroll.right {
+/* .dockingPanelScroll.right {
    overflow: hidden !important;
 }
 
 .viewerVSix ._endpoint_div_content {
    height: calc(100% - 75px);
-}
+} */
 </style>
