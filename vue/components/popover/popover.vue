@@ -1,5 +1,5 @@
 <template>
-   <v-popover offset="16">
+   <v-popover offset="16" @hide="hide">
       <md-button
          class="md-icon-button md-dense tooltip-target b3"
          title="Update">
@@ -16,9 +16,23 @@
             </div>
 
             <div class="popover-content" v-else>
-               <div v-if="state === STATES.processing">Processing...</div>
-               <div v-else-if="state === STATES.error">Error</div>
-               <div v-else-if="state === STATES.success">Success</div>
+               <div class="state-content" v-if="state === STATES.processing">
+                  <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
+               </div>
+
+               <div class="state-content" v-else-if="state === STATES.error">
+                  <div>
+                     <md-icon class="error md-size-3x">close</md-icon>
+                  </div>
+                  <div class="error">error</div>
+               </div>
+
+               <div class="state-content" v-else-if="state === STATES.success">
+                  <div>
+                     <md-icon class="success md-size-3x">check</md-icon>
+                  </div>
+                  <div class="success">Edited with Success</div>
+               </div>
             </div>
                        
 
@@ -102,6 +116,7 @@ export default {
       // }
       this.data.value = this.endpoint.currentValue;
       this.type = this.TYPES[typeof this.data.value];
+      this.state = this.STATES.normal;
    },
    methods: {
       async update() {
@@ -130,7 +145,7 @@ export default {
                const spinalPilot = new SpinalPilotModel(organ, requests);
                const endpointNode = SpinalGraphService.getRealNode(id);
                spinalPilot.addToNode(endpointNode);
-
+               this.state = this.STATES.processing;
                this.bindState(spinalPilot)
                
             } else {
@@ -159,16 +174,16 @@ export default {
                   break;
             }
          })
+      },
+
+      hide() {
+         this.state = this.STATES.normal;
       }
    },
 };
 </script>
 
 <style scoped>
-
-</style>
-
-<style>
 .endpoint_popover_container {
    width: 200px;
    height: 150px;
@@ -184,6 +199,23 @@ export default {
    justify-content: space-around;
 }
 
+.endpoint_popover_container .popover-content .state-content {
+   width: 100%;
+   height: 100%;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center ;
+}
+
+.endpoint_popover_container .popover-content .state-content .success {
+   color: rgb(37, 216, 37);
+}
+
+.endpoint_popover_container .popover-content .state-content .error {
+   color: #ff5252;
+}
+
 .endpoint_popover_container .popover-content .md-field {
    min-height: unset !important;
    margin: unset !important;
@@ -194,6 +226,8 @@ export default {
    margin-top: 10px;
 }
 
+
+
 .endpoint_popover_container .actions {
    width: 100%;
    height: 30px;
@@ -201,6 +235,10 @@ export default {
    justify-content: space-between;
    align-items: center;
 }
+</style>
+
+<style>
+
 
 /* .endpoint_popover_container .actions .btn {
    cursor: pointer;

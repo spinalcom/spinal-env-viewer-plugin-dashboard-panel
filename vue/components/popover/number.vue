@@ -9,6 +9,7 @@
          <vue-slider
             ref="slider"
             v-model="data.value"
+            v-bind="option"
          ></vue-slider>
       </div>
    </div>
@@ -27,7 +28,15 @@ export default {
       data : {}
    },
    data() {
-      return {}
+      return {
+         option : {
+            min: -2000,
+            max: 2000,
+            interval: 1,
+            tooltip: 'hover',
+            tooltipPlacement: 'bottom'
+         }
+      }
    },
    methods : {}
 }

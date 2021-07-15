@@ -71,7 +71,6 @@ const {
    spinalPanelManagerService,
 } = require("spinal-env-viewer-panel-manager-service");
 
-import VTooltip from "v-tooltip";
 
 import { setTimeout, clearTimeout } from "timers";
 import { alarmService } from "spinal-organ-threshold/dist";
@@ -82,7 +81,6 @@ import { utilities } from "../../alarm_manager/utilities";
 export default {
    name: "endpointComponent",
    components: {
-      "v-tooltip": VTooltip,
       "popover-component": PopoverComponent,
    },
    props: ["endpointNode", "endpointSelected", "itemCount", "viewer"],
