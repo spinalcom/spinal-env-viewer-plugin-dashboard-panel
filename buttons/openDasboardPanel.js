@@ -1,10 +1,13 @@
 const { SpinalContextApp } = require("spinal-env-viewer-context-menu-service");
 const { spinalPanelManagerService } = require("spinal-env-viewer-panel-manager-service");
-
 import { SpinalGraphService, SpinalNode } from "spinal-env-viewer-graph-service";
+const { spinalContextMenuService } = require("spinal-env-viewer-context-menu-service");
 
 import { TYPES, RELATION_NAMES } from "../js/constants";
 
+
+const SIDEBAR_HOOK_NAME = "GraphManagerSideBar";
+const CIRCULAR_MENU_HOOK_NAME = "circularMenu";
 
 
 class OpenDashboardPanel extends SpinalContextApp {
@@ -22,7 +25,6 @@ class OpenDashboardPanel extends SpinalContextApp {
       let selectedNode = option.selectedNode;
 
       if (!(option.selectedNode instanceof SpinalNode)) {
-        // SpinalGraphService._addNode(option.selectedNode);
         selectedNode = SpinalGraphService.getRealNode(option.selectedNode.id.get());
       }
 
@@ -38,8 +40,6 @@ class OpenDashboardPanel extends SpinalContextApp {
 
       return Promise.resolve(found ? true : -1);
     }
-
-
   }
 
   action(option) {
@@ -56,4 +56,10 @@ class OpenDashboardPanel extends SpinalContextApp {
   }
 }
 
-module.exports = OpenDashboardPanel;
+const openDashboardPanel = new OpenDashboardPanel();
+
+spinalContextMenuService.registerApp(SIDEBAR_HOOK_NAME, openDashboardPanel, [7]);
+spinalContextMenuService.registerApp(CIRCULAR_MENU_HOOK_NAME, openDashboardPanel, [7]);
+
+export { openDashboardPanel }
+export default openDashboardPanel;

@@ -1,6 +1,6 @@
 import { SpinalGraphService } from "spinal-env-viewer-graph-service"
 import { SpinalBmsNetwork, SpinalBmsDevice, SpinalBmsEndpoint, SpinalBmsEndpointGroup } from "spinal-model-bmsnetwork";
-import { BACNET_ORGAN_TYPE } from 'spinal-model-bacnet';
+import { BACNET_ORGAN_TYPE, SpinalPilotModel } from 'spinal-model-bacnet';
 
 export default {
    getEndpointOrgan(endpointNodeId) {
@@ -70,5 +70,36 @@ export default {
       }
 
       return []
+   },
+
+   async sendUpdateRequest(nodeId,endpointNode,value) {
+      const [organNode] = await this.getEndpointOrgan(nodeId);
+      const devices = await this.getDevices(nodeId);
+     
+      if (organNode && devices && devices.length > 0) {
+         const organ = await organNode.getElement();
+         if (organ) {
+            const endpointElement = await endpointNode.getElement()
+
+            const requests = devices.map((device) => {
+               return {
+                  address:
+                     device.info.address && device.info.address.get(),
+                  deviceId:
+                     device.info.idNetwork && device.info.idNetwork.get(),
+                  objectId: {
+                     type: endpointElement.typeId.get(),
+                     instance: endpointElement.id.get(),
+                  },
+                  value: value,
+               };
+            });
+
+            const spinalPilot = new SpinalPilotModel(organ, requests);
+            await spinalPilot.addToNode(endpointNode);
+            return spinalPilot;
+         }
+
+      }
    }
 }
