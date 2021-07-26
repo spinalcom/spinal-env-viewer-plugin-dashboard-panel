@@ -11,7 +11,9 @@
 				{{ endpoint.currentValue | formatValue }}
 			</div>
 
-			<div class="unit" v-tooltip="endpoint.unit">{{ endpoint.unit }}</div>
+			<div class="unit" v-tooltip="endpoint.unit">
+				{{ endpoint.unit | formatUnit }}
+			</div>
 		</div>
 
 		<div class="btnGroup">
@@ -155,6 +157,10 @@
 					return Number(argCurrentValue).toFixed(2);
 				return argCurrentValue;
 			},
+
+			formatUnit(argUnit) {
+				return argUnit && argUnit.length > 0 ? argUnit : "-";
+			},
 		},
 
 		beforeDestroy() {
@@ -189,7 +195,7 @@
 		width: 100%;
 		height: 20%;
 		text-align: center;
-		font-size: 12px;
+		font-size: 1em;
 		text-transform: uppercase;
 		font-weight: bold;
 		white-space: nowrap;
@@ -206,10 +212,10 @@
 
 	.endpointDiv .values .value {
 		width: 70%;
-		height: 50%;
+		height: 60%;
 		margin: auto;
 		padding-top: 7px;
-		font-size: 25px;
+		font-size: 1.9em;
 		align-items: center;
 		text-align: center;
 		white-space: nowrap;
@@ -218,10 +224,10 @@
 	}
 	.endpointDiv .values .unit {
 		width: 50%;
-		height: 50%;
+		height: 40%;
 		float: right;
 		text-align: right;
-		font-size: 10px;
+		font-size: 0.9em;
 		align-items: center;
 		white-space: nowrap;
 		overflow: hidden;
