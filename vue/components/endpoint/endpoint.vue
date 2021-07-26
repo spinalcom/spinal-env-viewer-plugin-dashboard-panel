@@ -174,7 +174,8 @@
 		width: 95%;
 		height: 95%;
 		padding: 7px;
-		background: #000;
+		border: 1px solid #fff;
+		/* background: #000; */
 	}
 
 	.endpointDiv.loading {

@@ -126,10 +126,12 @@
 	}
 
 	.controlpoint_main .main {
-		width: 100%;
+		width: calc(100% - 30px);
 		height: calc(100% - 100px);
+		margin: auto;
 		overflow: hidden;
 		overflow-y: auto;
+		padding: 0 15px;
 		/* background: brown; */
 	}
 
