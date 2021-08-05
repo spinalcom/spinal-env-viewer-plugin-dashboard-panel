@@ -5,6 +5,7 @@ let hasEndPoint = "hasEndPoint";
 
 export const TYPES = [SpinalBmsDevice.nodeTypeName, SpinalBmsEndpoint.nodeTypeName, SpinalBmsEndpointGroup.nodeTypeName];
 export const BMS_ENDPOINT_RELATIONS = [hasEndPoint, SpinalBmsDevice.relationName, SpinalBmsEndpoint.relationName, SpinalBmsEndpointGroup.relationName, dashboardVariables.ENDPOINT_RELATION_NAME];
-export const CONTROL_ENDPOINT_RELATIONS = [spinalControlPointService.ROOM_TO_CONTROL_GROUP]
+
+export const CONTROL_ENDPOINT_RELATIONS = [spinalControlPointService.ROOM_TO_CONTROL_GROUP, ...BMS_ENDPOINT_RELATIONS]
 export const RELATION_NAMES = [...BMS_ENDPOINT_RELATIONS, ...CONTROL_ENDPOINT_RELATIONS] ;
 

@@ -122,7 +122,7 @@
 		width: calc(100% - 10px);
 		height: calc(100% - 20px);
 		margin: auto;
-		/* background-color: unset !important; */
+		background-color: #424242;
 	}
 
 	.dashboardPanelContent .header {
