@@ -19,7 +19,7 @@
 			<endpoint-component
 				v-for="endpoint of itemsDiplayed"
 				:key="endpoint.id.get()"
-				:endpointModel="endpoint"
+				:endpointId="endpoint.id.get()"
 				:endpointSelected="endpointSelected"
 				@select="selectEndpoint"
 			></endpoint-component>

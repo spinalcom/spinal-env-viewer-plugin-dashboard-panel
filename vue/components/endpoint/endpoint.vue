@@ -53,7 +53,7 @@
 
 	export default {
 		name: "endpoint-component",
-		props: ["endpointModel", "endpointSelected"],
+		props: ["endpointId", "endpointSelected"],
 		components: {
 			"popover-component": PopoverComponent,
 		},
@@ -74,8 +74,7 @@
 			};
 		},
 		async mounted() {
-			const id = this.endpointModel.id.get();
-			this.endpointNode = SpinalGraphService.getRealNode(id);
+			this.endpointNode = SpinalGraphService.getRealNode(this.endpointId);
 			this.endpointElement =
 				this.endpointNode && (await this.endpointNode.getElement());
 
@@ -83,13 +82,13 @@
 		},
 		methods: {
 			selectEndpoint() {
-				this.$emit("select", this.endpointModel.id.get());
+				this.$emit("select", this.endpointId);
 			},
 
 			openGraphPanel() {
 				console.log(this.endpointNode);
 				spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
-					selectedNode: this.endpointModel,
+					selectedNode: SpinalGraphService.getInfo(this.endpointId),
 				});
 			},
 
@@ -104,7 +103,7 @@
 				const popovers = Array.isArray(p) ? p : [p];
 
 				try {
-					const id = this.endpointModel.id.get();
+					const id = this.endpointId;
 					const spinalPilot = await pilotageUtilities.sendUpdateRequest(
 						id,
 						this.endpointNode,
@@ -144,7 +143,7 @@
 		},
 		computed: {
 			isSelected() {
-				return this.endpointSelected === this.endpointModel.id.get();
+				return this.endpointSelected === this.endpointId;
 			},
 		},
 		filters: {

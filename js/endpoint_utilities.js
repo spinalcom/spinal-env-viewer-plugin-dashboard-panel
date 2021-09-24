@@ -23,6 +23,7 @@ export default {
    getEndpoints(nodeId, relations) {
       return SpinalGraphService.findNodesByType(nodeId, relations, SpinalBmsEndpoint.nodeTypeName)
                .then((endpoints) => {
+                  console.log("endpoints",endpoints);
                   return endpoints.map((el) => {
                      SpinalGraphService._addNode(el);
                      return SpinalGraphService.getInfo(el.getId().get());
@@ -32,6 +33,7 @@ export default {
                   console.log(err);
                   return [];
                });
+
    }
 
 }
