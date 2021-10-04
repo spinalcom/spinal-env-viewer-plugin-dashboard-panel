@@ -1,11 +1,13 @@
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import { BMS_ENDPOINT_RELATIONS, CONTROL_ENDPOINT_RELATIONS } from "./constants";
+import { BMS_ENDPOINT_RELATIONS, CONTROL_ENDPOINT_RELATIONS, hasControlEnpoint } from "./constants";
 import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
 
-export default {
+export const endpointsMap = new Map();
 
+export default {
+   
    getTreeStructure(nodeId) {
-      return Promise.all([this.getEndpoints(nodeId, BMS_ENDPOINT_RELATIONS),this.getEndpoints(nodeId, CONTROL_ENDPOINT_RELATIONS)])
+      return Promise.all([this.getEndpoints(nodeId),this.getControlEndpoints(nodeId)])
                .then(([endpoints, controlPoints]) => {
                   return {
                      endpoints,
@@ -20,13 +22,17 @@ export default {
                })
    },
 
-   getEndpoints(nodeId, relations) {
-      return SpinalGraphService.findNodesByType(nodeId, relations, SpinalBmsEndpoint.nodeTypeName)
+   getEndpoints(nodeId) {
+      return SpinalGraphService.findNodesByType(nodeId, BMS_ENDPOINT_RELATIONS, SpinalBmsEndpoint.nodeTypeName)
                .then((endpoints) => {
-                  console.log("endpoints",endpoints);
                   return endpoints.map((el) => {
                      SpinalGraphService._addNode(el);
-                     return SpinalGraphService.getInfo(el.getId().get());
+                     const id = el.getId().get();
+
+                     return {
+                        id ,
+                        name : el.getName().get()
+                     };
                   });
                })
                .catch((err) => {
@@ -34,6 +40,30 @@ export default {
                   return [];
                });
 
+   },
+
+   async getControlEndpoints(nodeId) {
+
+      const controlPoints = await SpinalGraphService.getChildren(nodeId,[hasControlEnpoint]);
+      if(controlPoints.length === 0) return [];
+      
+      const promises = controlPoints.map(el => {
+         return SpinalGraphService.findNodesByType(el.id.get(),CONTROL_ENDPOINT_RELATIONS,SpinalBmsEndpoint.nodeTypeName);
+      })
+
+      return Promise.all(promises).then((result) => {
+         const endpoints = result.flat();
+         return endpoints.map(endpoint => {
+            SpinalGraphService._addNode(endpoint);
+            return  {
+               id : el.getId().get(),
+               name : el.getName().get()
+            };
+
+         })
+      }).catch((err) => {
+         
+      });
    }
 
 }

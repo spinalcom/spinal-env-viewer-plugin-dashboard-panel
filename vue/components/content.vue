@@ -38,8 +38,8 @@
 				type: Number,
 				default: 3,
 			},
-
-			data: {},
+			endpoints: Array,
+			controlEndpoints: Array,
 		},
 		data() {
 			this.tabs = {
@@ -48,32 +48,59 @@
 			};
 			return {
 				tabSelected: "",
+				contents: [],
 			};
 		},
 
 		mounted() {
 			this.tabSelected = this.tabs.endpoints;
-			this.endpoints = this.data.endpoints;
-			this.controlpoints = this.data.controlPoints;
+			// this.endpoints = this.data.endpoints;
+			// this.controlpoints = this.data.controlPoints;
 		},
 
 		methods: {
 			selectTab(tabName) {
 				this.tabSelected = tabName;
 			},
-		},
-		computed: {
-			contents() {
+
+			updateContents() {
 				switch (this.tabSelected) {
 					case this.tabs.endpoints:
-						return this.data.endpoints;
+						this.contents = this.endpoints;
+						break;
 					case this.tabs.controlPoints:
-						return this.data.controlPoints;
+						this.contents = this.controlEndpoints;
+						break;
 					default:
 						return [];
 				}
 			},
 		},
+		watch: {
+			tabSelected() {
+				this.updateContents();
+			},
+
+			endpoints() {
+				this.updateContents();
+			},
+
+			controlEndpoints() {
+				this.updateContents();
+			},
+		},
+		// computed: {
+		// 	contents() {
+		// 		switch (this.tabSelected) {
+		// 			case this.tabs.endpoints:
+		// 				return this.data.endpoints;
+		// 			case this.tabs.controlPoints:
+		// 				return this.data.controlPoints;
+		// 			default:
+		// 				return [];
+		// 		}
+		// 	},
+		// },
 	};
 </script>
 

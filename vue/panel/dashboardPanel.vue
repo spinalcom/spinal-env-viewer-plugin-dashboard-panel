@@ -11,7 +11,8 @@
 		<div class="content">
 			<panel-content
 				:itemCountPerLine="itemCountPerLine"
-				:data="data"
+				:endpoints="endpoints"
+				:controlEndpoints="controlEndpoints"
 			></panel-content>
 		</div>
 	</div>
@@ -57,30 +58,25 @@
 				// endpointsNode: null,
 				// endpointSelected: null,
 				itemCountPerLine: 3,
-				data: {},
+				endpoints: [],
+				controlEndpoints: [],
 			};
 		},
 		methods: {
 			opened(option, viewer) {
 				this.viewer = viewer;
+
 				this.setTitle(option.name.get());
 				this.pageSelected = this.PAGES.loading;
 				endpointUtilities
 					.getTreeStructure(option.id.get())
 					.then((result) => {
-						console.log("result", result);
-						this.data = result;
+						this.endpoints = result.endpoints;
+						this.controlEndpoints = result.controlPoints;
+
 						this.pageSelected = this.PAGES.normal;
 					})
 					.catch((err) => (this.pageSelected = this.PAGES.error));
-				// this.getEndpointsNode(option)
-				//    .then((endpoints) => {
-				//       this.endpointsNode = endpoints;
-				//       this.pageSelected = this.PAGES.normal;
-				//    })
-				//    .catch((err) => {
-				//       this.pageSelected = this.PAGES.error;
-				//    });
 			},
 
 			closed() {},

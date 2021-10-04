@@ -18,8 +18,8 @@
 		<md-content class="main md-scrollbar" :style="gridStyle">
 			<endpoint-component
 				v-for="endpoint of itemsDiplayed"
-				:key="endpoint.id.get()"
-				:endpointId="endpoint.id.get()"
+				:key="endpoint.id"
+				:endpointId="endpoint.id"
 				:endpointSelected="endpointSelected"
 				@select="selectEndpoint"
 			></endpoint-component>
@@ -30,7 +30,7 @@
 		<div class="footer">
 			<jw-pagination
 				:items="search"
-				:pageSize="12"
+				:pageSize="9"
 				@changePage="onPageChange"
 			></jw-pagination>
 		</div>
@@ -78,8 +78,7 @@
 			filteredData() {
 				this.search = this.data.filter((el) => {
 					if (this.searchText.length === 0) return true;
-					const name = el.name.get();
-					return name
+					return el.name
 						.toLowerCase()
 						.includes(this.searchText.toLowerCase());
 				});
