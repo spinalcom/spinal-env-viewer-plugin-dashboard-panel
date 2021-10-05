@@ -56,8 +56,8 @@ export default {
          return endpoints.map(endpoint => {
             SpinalGraphService._addNode(endpoint);
             return  {
-               id : el.getId().get(),
-               name : el.getName().get()
+               id : endpoint.getId().get(),
+               name : endpoint.getName().get()
             };
 
          })
