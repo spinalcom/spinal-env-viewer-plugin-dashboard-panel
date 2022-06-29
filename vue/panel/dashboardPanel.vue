@@ -33,6 +33,8 @@ with this file. If not, see
 
     <div class="content">
       <panel-content :itemCountPerLine="itemCountPerLine"
+                     @removed="removeEndpoint"
+                     :tabs="tabs"
                      :endpoints="endpoints"
                      :controlEndpoints="controlEndpoints"></panel-content>
     </div>
@@ -74,6 +76,11 @@ export default {
       error: 3,
     };
 
+    this.tabs = {
+      endpoints: "endpoints-component",
+      controlPoints: "controlpoints-component",
+    };
+
     return {
       pageSelected: this.PAGES.normal,
       // endpointsNode: null,
@@ -101,6 +108,19 @@ export default {
     },
 
     closed() {},
+
+    removeEndpoint(data) {
+      switch (data.type) {
+        case this.tabs.endpoints:
+          this.endpoints = this.endpoints.filter((el) => el.id !== data.id);
+          break;
+        case this.tabs.controlPoints:
+          this.controlEndpoints = this.controlEndpoints.filter(
+            (el) => el.id !== data.id
+          );
+          break;
+      }
+    },
 
     // getEndpointsNode(node) {
     //    return SpinalGraphService.findNodesByType(
