@@ -23,267 +23,345 @@ with this file. If not, see
 -->
 
 <template>
-	<div
-		class="endpointDiv"
-		:class="{ selected: isSelected }"
-		@click="selectEndpoint"
-		v-if="endpoint"
-	>
-		<div class="name" v-tooltip="endpoint.name">{{ endpoint.name }}</div>
-		<div class="values">
-			<div class="value" v-tooltip="endpoint.currentValue">
-				{{ endpoint.currentValue | formatValue }}
-			</div>
+  <div
+    class="endpointDiv"
+    :class="{ selected: isSelected }"
+    @click="selectEndpoint"
+    v-if="endpoint"
+  >
+    <div class="name" v-tooltip="endpoint.name">{{ endpoint.name }}</div>
+    <div class="values">
+      <div class="value" v-tooltip="endpoint.currentValue">
+        {{ endpoint.currentValue | formatValue }}
+      </div>
 
-			<div class="unit" v-tooltip="endpoint.unit">
-				{{ endpoint.unit | formatUnit }}
-			</div>
-		</div>
+      <div class="unit" v-tooltip="endpoint.unit">
+        {{ endpoint.unit | formatUnit }}
+      </div>
+    </div>
 
-		<div class="btnGroup">
-			<md-button
-				v-for="icon in iconsItems"
-				:key="icon.iconName"
-				class="md-icon-button md-dense"
-				:title="icon.title"
-				@click="icon.clickMethod"
-			>
-				<md-icon class="endpointIcons">
-					{{ icon.iconName }}
-				</md-icon>
-			</md-button>
+    <div class="btnGroup">
+      <md-button
+        v-for="icon in iconsItems"
+        :key="icon.iconName"
+        class="md-icon-button md-dense"
+        :title="icon.title"
+        @click="icon.clickMethod"
+      >
+        <md-icon class="endpointIcons">
+          {{ icon.iconName }}
+        </md-icon>
+      </md-button>
 
-			<popover-component
-				ref="popover"
-				:defaultValue="endpoint.currentValue"
-				@update="update"
-			></popover-component>
-		</div>
-	</div>
+      <popover-component
+        ref="popover"
+        :defaultValue="endpoint.currentValue"
+        @update="update"
+      ></popover-component>
+    </div>
+  </div>
 
-	<div class="endpointDiv loading" v-else>
-		<md-progress-spinner md-mode="indeterminate"> </md-progress-spinner>
-	</div>
+  <div class="endpointDiv loading" v-else>
+    <md-progress-spinner md-mode="indeterminate"> </md-progress-spinner>
+  </div>
 </template>
 
 <script>
-	const {
-		spinalPanelManagerService,
-	} = require("spinal-env-viewer-panel-manager-service");
+const {
+  spinalPanelManagerService
+} = require("spinal-env-viewer-panel-manager-service");
 
-	import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-	import pilotageUtilities from "../../../js/pilotage_utilities";
-	import PopoverComponent from "../popover/popover.vue";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import pilotageUtilities from "../../../js/pilotage_utilities";
+import PopoverComponent from "../popover/popover.vue";
+import { SpinalServiceTimeseries } from "spinal-model-timeseries";
+import XLSX from "xlsx";
+import { attributeService } from "spinal-env-viewer-plugin-documentation-service";
 
-	export default {
-		name: "endpoint-component",
-		props: ["endpointId", "endpointSelected"],
-		components: {
-			"popover-component": PopoverComponent,
-		},
-		data() {
-			this.iconsItems = [
-				{
-					title: "open Graph Panel",
-					clickMethod: this.openGraphPanel,
-					iconName: "show_chart",
-				},
-				{
-					title: "Documentation",
-					clickMethod: this.openDocumentationPanel,
-					iconName: "folder"
-				}
+export default {
+  name: "endpoint-component",
+  props: ["endpointId", "endpointSelected"],
+  components: {
+    "popover-component": PopoverComponent
+  },
+  data() {
+    this.iconsItems = [
+      {
+        title: "open Graph Panel",
+        clickMethod: this.openGraphPanel,
+        iconName: "show_chart"
+      },
+      {
+        title: "Documentation",
+        clickMethod: this.openDocumentationPanel,
+        iconName: "folder"
+      },
+      {
+        title: "Download",
+        clickMethod: this.download,
+        iconName: "file_download"
+      }
+    ];
+    this.bindId;
 
-			];
-			this.bindId;
+    return {
+      endpointElement: null,
+      endpointNode: null,
+      endpoint: {},
+      timeseriesItems: []
+    };
+  },
+  async mounted() {
+    this.endpointNode = SpinalGraphService.getRealNode(this.endpointId);
+    this.endpointElement =
+      this.endpointNode && (await this.endpointNode.getElement());
 
-			return {
-				endpointElement: null,
-				endpointNode: null,
-				endpoint: {},
-			};
-		},
-		async mounted() {
-			this.endpointNode = SpinalGraphService.getRealNode(this.endpointId);
-			this.endpointElement =
-				this.endpointNode && (await this.endpointNode.getElement());
+    this.bindEndpointElement();
+  },
+  methods: {
+    selectEndpoint() {
+      this.$emit("select", this.endpointId);
+    },
 
-			this.bindEndpointElement();
-		},
-		methods: {
-			selectEndpoint() {
-				this.$emit("select", this.endpointId);
-			},
+    async download() {
+      const spinalServiceTimeseries = new SpinalServiceTimeseries();
+      //console.log("Hello from download\n");
+      //console.log(this.endpointNode.info.endpointId);
+      if (this.endpointNode.info.id) {
+        let getTSvar = await spinalServiceTimeseries.getTimeSeries(
+          this.endpointNode.info.id
+        );
+        //console.log(getTSvar);
+        if (getTSvar) {
+          console.log("defined endpoint timeseries");
+          let getInter = await spinalServiceTimeseries.getFromIntervalTime(
+            getTSvar
+          );
+          this.timeseriesItems = getInter;
 
-			openGraphPanel() {
-				console.log(this.endpointNode);
-				spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
-					selectedNode: SpinalGraphService.getInfo(this.endpointId),
-				});
-			},
-			openDocumentationPanel(){
-				let realNode = SpinalGraphService.getRealNode(this.endpointId);
-				let paramSent = {
-					selectedNode: realNode,
-					info: realNode.info
-				};
-				paramSent.selectedNode.id = realNode.info.id;
-				spinalPanelManagerService.openPanel("panel-documentation", paramSent);
-			},
+          let nodeTitle = spinalPanelManagerService.panels.spinal_dashboard_panel.panel.title.innerText.split(
+            ":"
+          );
+          //let splitArray = nodeTitle.split(":");
 
-			bindEndpointElement() {
-				this.bindId = this.endpointElement.bind(() => {
-					this.endpoint = this.endpointElement.get();
-				});
-			},
+          let excelFileName =
+            nodeTitle[nodeTitle.length - 1] +
+            "_" +
+            this.endpointNode.info.name.get();
 
-			async update(value) {
-				const p = this.$refs["popover"];
-				const popovers = Array.isArray(p) ? p : [p];
+          let getUnit = await attributeService.getAttributesByCategory(
+            this.endpointNode,
+            "default",
+            "unit"
+          );
 
-				try {
-					const id = this.endpointId;
-					const spinalPilot = await pilotageUtilities.sendUpdateRequest(
-						id,
-						this.endpointNode,
-						value
-					);
-					if (spinalPilot) {
-						this.bindState(spinalPilot, popovers, value);
-					} else {
-						this.endpointElement.currentValue.set(value);
-					}
-				} catch (error) {
-					console.error(error);
-					popovers.map((el) => el.setErrorMode());
-				}
-			},
+          const filename = `${excelFileName}.xlsx`.trim();
+          console.log("this is unit: ", getUnit[0].value.get());
+          let unit = getUnit[0].value.get();
 
-			bindState(spinalPilot, popovers, value) {
-				const bindId = spinalPilot.state.bind(async () => {
-					switch (spinalPilot.state.get()) {
-						case "success":
-							this.endpointElement.currentValue.set(value);
-							popovers.map((el) => el.setSuccessMode());
-							spinalPilot.state.unbind(bindId);
-							await spinalPilot.removeToNode();
-							break;
-						case "error":
-							popovers.map((el) => el.setErrorMode());
-							spinalPilot.state.unbind(bindId);
-							await spinalPilot.removeToNode();
-							break;
+          for (let el of this.timeseriesItems) {
+            el.date = new Date(el.date);
+            el.unit = unit;
+          }
 
-						default:
-							break;
-					}
-				});
-			},
-		},
-		computed: {
-			isSelected() {
-				return this.endpointSelected === this.endpointId;
-			},
-		},
-		filters: {
-			formatValue(argCurrentValue) {
-				var argCurrentValueNumber = Number(argCurrentValue);
-				if (
-					!isNaN(argCurrentValueNumber) &&
-					!Number.isInteger(argCurrentValueNumber)
-				)
-					return Number(argCurrentValue).toFixed(2);
-				return argCurrentValue;
-			},
+          console.log(this.timeseriesItems);
 
-			formatUnit(argUnit) {
-				return argUnit && argUnit.length > 0 ? argUnit : "-";
-			},
-		},
+          const data = XLSX.utils.json_to_sheet(this.timeseriesItems);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, data, "endpoint_controlpoint");
+          XLSX.writeFile(wb, filename);
+        } else {
+          console.log("undefined endpoint timeseries");
+        }
 
-		beforeDestroy() {
-			if (this.endpointElement) this.endpointElement.unbind(this.bindId);
-		},
-	};
+        //console.log(getInter);
+      }
+
+      /* let parentEndpoint = await SpinalGraphService.getRealNode(
+        this.endpointId
+      ).getParents();
+      console.log("this is parent: \n");
+      console.log(parentEndpoint[0].info.name);
+      let parentOfParent = await parentEndpoint[0].getParents();
+      for (let par of parentOfParent) {
+        if (par) {
+          if (par.info.type == "geographicFloor") {
+            console.log("this is floor wanted : \n");
+            console.log(par.info.name.get());
+          }
+        }
+      } */
+    },
+
+    openGraphPanel() {
+      console.log(this.endpointNode);
+      spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
+        selectedNode: SpinalGraphService.getInfo(this.endpointId)
+      });
+    },
+    openDocumentationPanel() {
+      let realNode = SpinalGraphService.getRealNode(this.endpointId);
+      let paramSent = {
+        selectedNode: realNode,
+        info: realNode.info
+      };
+      paramSent.selectedNode.id = realNode.info.id;
+      spinalPanelManagerService.openPanel("panel-documentation", paramSent);
+    },
+
+    bindEndpointElement() {
+      this.bindId = this.endpointElement.bind(() => {
+        this.endpoint = this.endpointElement.get();
+      });
+    },
+
+    async update(value) {
+      const p = this.$refs["popover"];
+      const popovers = Array.isArray(p) ? p : [p];
+
+      try {
+        const id = this.endpointId;
+        const spinalPilot = await pilotageUtilities.sendUpdateRequest(
+          id,
+          this.endpointNode,
+          value
+        );
+        if (spinalPilot) {
+          this.bindState(spinalPilot, popovers, value);
+        } else {
+          this.endpointElement.currentValue.set(value);
+        }
+      } catch (error) {
+        console.error(error);
+        popovers.map(el => el.setErrorMode());
+      }
+    },
+
+    bindState(spinalPilot, popovers, value) {
+      const bindId = spinalPilot.state.bind(async () => {
+        switch (spinalPilot.state.get()) {
+          case "success":
+            this.endpointElement.currentValue.set(value);
+            popovers.map(el => el.setSuccessMode());
+            spinalPilot.state.unbind(bindId);
+            await spinalPilot.removeToNode();
+            break;
+          case "error":
+            popovers.map(el => el.setErrorMode());
+            spinalPilot.state.unbind(bindId);
+            await spinalPilot.removeToNode();
+            break;
+
+          default:
+            break;
+        }
+      });
+    }
+  },
+  computed: {
+    isSelected() {
+      return this.endpointSelected === this.endpointId;
+    }
+  },
+  filters: {
+    formatValue(argCurrentValue) {
+      var argCurrentValueNumber = Number(argCurrentValue);
+      if (
+        !isNaN(argCurrentValueNumber) &&
+        !Number.isInteger(argCurrentValueNumber)
+      )
+        return Number(argCurrentValue).toFixed(2);
+      return argCurrentValue;
+    },
+
+    formatUnit(argUnit) {
+      return argUnit && argUnit.length > 0 ? argUnit : "-";
+    }
+  },
+
+  beforeDestroy() {
+    if (this.endpointElement) this.endpointElement.unbind(this.bindId);
+  }
+};
 </script>
 
 <style scoped>
-	.endpointDiv {
-		width: 95%;
-		height: 95%;
-		padding: 7px;
-		border: 1px solid #fff;
-		/* background: #000; */
-	}
+.endpointDiv {
+  width: 95%;
+  height: 95%;
+  padding: 7px;
+  border: 1px solid #fff;
+  /* background: #000; */
+}
 
-	.endpointDiv.loading {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+.endpointDiv.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-	.endpointDiv:hover {
-		cursor: pointer;
-	}
+.endpointDiv:hover {
+  cursor: pointer;
+}
 
-	.endpointDiv.selected {
-		background: #356bab !important;
-	}
+.endpointDiv.selected {
+  background: #356bab !important;
+}
 
-	.endpointDiv .name {
-		width: 100%;
-		height: 20%;
-		text-align: center;
-		font-size: 1em;
-		text-transform: uppercase;
-		font-weight: bold;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
+.endpointDiv .name {
+  width: 100%;
+  height: 20%;
+  text-align: center;
+  font-size: 1em;
+  text-transform: uppercase;
+  font-weight: bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 
-	.endpointDiv .values {
-		width: 100%;
-		height: 50%;
-		color: #f68204;
-		text-transform: uppercase;
-	}
+.endpointDiv .values {
+  width: 100%;
+  height: 50%;
+  color: #f68204;
+  text-transform: uppercase;
+}
 
-	.endpointDiv .values .value {
-		width: 70%;
-		height: 60%;
-		margin: auto;
-		padding-top: 7px;
-		font-size: 1.9em;
-		align-items: center;
-		text-align: center;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.endpointDiv .values .unit {
-		width: 50%;
-		height: 40%;
-		float: right;
-		text-align: right;
-		font-size: 0.9em;
-		align-items: center;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
+.endpointDiv .values .value {
+  width: 70%;
+  height: 60%;
+  margin: auto;
+  padding-top: 7px;
+  font-size: 1.9em;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.endpointDiv .values .unit {
+  width: 50%;
+  height: 40%;
+  float: right;
+  text-align: right;
+  font-size: 0.9em;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-	.endpointDiv .btnGroup {
-		width: 100%;
-		height: 30%;
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-	}
+.endpointDiv .btnGroup {
+  width: 100%;
+  height: 30%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
 </style>
 
 <style>
-	.endpointDiv .btnGroup .md-button .md-ripple {
-		padding: unset !important;
-	}
+.endpointDiv .btnGroup .md-button .md-ripple {
+  padding: unset !important;
+}
 </style>
