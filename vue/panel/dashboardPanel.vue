@@ -23,31 +23,34 @@ with this file. If not, see
 -->
 
 <template>
-  <div class="dashboardPanelContent"
-       v-if="pageSelected === PAGES.normal">
+  <div class="dashboardPanelContent" v-if="pageSelected === PAGES.normal">
     <div class="header">
-      <panel-header :itemCountPerLine="itemCountPerLine"
-                    @increments="itemCountPerLine++"
-                    @decrements="itemCountPerLine--"></panel-header>
+      <panel-header
+        :itemCountPerLine="itemCountPerLine"
+        @increments="itemCountPerLine++"
+        @decrements="itemCountPerLine--"
+      ></panel-header>
     </div>
 
     <div class="content">
-      <panel-content :itemCountPerLine="itemCountPerLine"
-                     @removed="removeEndpoint"
-                     :tabs="tabs"
-                     :endpoints="endpoints"
-                     :controlEndpoints="controlEndpoints"></panel-content>
+      <panel-content
+        :itemCountPerLine="itemCountPerLine"
+        @removed="removeEndpoint"
+        :tabs="tabs"
+        :endpoints="endpoints"
+        :controlEndpoints="controlEndpoints"
+      ></panel-content>
     </div>
   </div>
 
-  <div class="dashboardPanelContent state"
-       v-else>
-    <md-progress-spinner v-if="pageSelected === PAGES.loading"
-                         md-mode="indeterminate">
+  <div class="dashboardPanelContent state" v-else>
+    <md-progress-spinner
+      v-if="pageSelected === PAGES.loading"
+      md-mode="indeterminate"
+    >
     </md-progress-spinner>
 
-    <md-icon v-else-if="pageSelected === PAGES.error"
-             class="md-size-4x">
+    <md-icon v-else-if="pageSelected === PAGES.error" class="md-size-4x">
       close
     </md-icon>
   </div>
@@ -55,7 +58,7 @@ with this file. If not, see
 
 <script>
 const {
-  spinalPanelManagerService,
+  spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
 import endpointUtilities from "../../js/endpoint_utilities";
@@ -66,19 +69,19 @@ export default {
   name: "dashboard-panel",
   components: {
     "panel-header": HeaderComponent,
-    "panel-content": ContentComponent,
+    "panel-content": ContentComponent
   },
   data() {
     this.viewer;
     this.PAGES = {
       normal: 1,
       loading: 2,
-      error: 3,
+      error: 3
     };
 
     this.tabs = {
       endpoints: "endpoints-component",
-      controlPoints: "controlpoints-component",
+      controlPoints: "controlpoints-component"
     };
 
     return {
@@ -87,7 +90,7 @@ export default {
       // endpointSelected: null,
       itemCountPerLine: 3,
       endpoints: [],
-      controlEndpoints: [],
+      controlEndpoints: []
     };
   },
   methods: {
@@ -98,13 +101,13 @@ export default {
       this.pageSelected = this.PAGES.loading;
       endpointUtilities
         .getTreeStructure(option.id.get())
-        .then((result) => {
+        .then(result => {
           this.endpoints = result.endpoints;
           this.controlEndpoints = result.controlPoints;
 
           this.pageSelected = this.PAGES.normal;
         })
-        .catch((err) => (this.pageSelected = this.PAGES.error));
+        .catch(err => (this.pageSelected = this.PAGES.error));
     },
 
     closed() {},
@@ -112,11 +115,11 @@ export default {
     removeEndpoint(data) {
       switch (data.type) {
         case this.tabs.endpoints:
-          this.endpoints = this.endpoints.filter((el) => el.id !== data.id);
+          this.endpoints = this.endpoints.filter(el => el.id !== data.id);
           break;
         case this.tabs.controlPoints:
           this.controlEndpoints = this.controlEndpoints.filter(
-            (el) => el.id !== data.id
+            el => el.id !== data.id
           );
           break;
       }
@@ -144,13 +147,13 @@ export default {
       spinalPanelManagerService.panels.spinal_dashboard_panel.panel.setTitle(
         `Dashboard : ${title}`
       );
-    },
+    }
   },
   computed: {
     V6() {
       return parseInt(window.LMV_VIEWER_VERSION) === 6;
-    },
-  },
+    }
+  }
 };
 </script>
 
