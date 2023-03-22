@@ -23,56 +23,52 @@ with this file. If not, see
 -->
 
 <template>
-  <div
-    class="endpointDiv"
-    :class="{ selected: isSelected }"
-    @click="selectEndpoint"
-    v-if="endpoint"
-  >
-    <div class="name" v-tooltip="endpoint.name">{{ endpoint.name }}</div>
+  <div class="endpointDiv"
+       :class="{ selected: isSelected }"
+       @click="selectEndpoint"
+       v-if="endpoint">
+    <div class="name"
+         v-tooltip="endpoint.name">{{ endpoint.name }}</div>
     <div class="values">
-      <div class="value" v-tooltip="endpoint.currentValue">
+      <div class="value"
+           v-tooltip="endpoint.currentValue">
         {{ endpoint.currentValue | formatValue }}
       </div>
 
-      <div class="unit" v-tooltip="endpoint.unit">
+      <div class="unit"
+           v-tooltip="endpoint.unit">
         {{ endpoint.unit | formatUnit }}
       </div>
     </div>
 
     <div class="btnGroup">
       <template v-if="iconsItems.length < 3">
-        <md-button
-          v-for="icon in iconsItems"
-          :key="icon.iconName"
-          class="md-icon-button md-dense"
-          :title="icon.title"
-          @click="icon.clickMethod"
-        >
+        <md-button v-for="icon in iconsItems"
+                   :key="icon.iconName"
+                   class="md-icon-button md-dense"
+                   :title="icon.title"
+                   @click="icon.clickMethod">
           <md-icon class="endpointIcons">
             {{ icon.iconName }}
           </md-icon>
         </md-button>
       </template>
-      <popover-component
-        ref="popover"
-        :defaultValue="endpoint.currentValue"
-        @update="update"
-      ></popover-component>
+      <popover-component ref="popover"
+                         :defaultValue="endpoint.currentValue"
+                         @update="update"></popover-component>
       <template v-if="iconsItems.length >= 3">
         <md-menu md-size="small">
-          <md-button md-menu-trigger class="md-icon-button">
+          <md-button md-menu-trigger
+                     class="md-icon-button">
             <md-icon>more_vert</md-icon>
           </md-button>
 
           <md-menu-content>
-            <md-menu-item
-              v-for="icon in iconsItems"
-              class="endpointMenuItem"
-              :key="icon.iconName"
-              :title="icon.title"
-              @click="icon.clickMethod"
-            >
+            <md-menu-item v-for="icon in iconsItems"
+                          class="endpointMenuItem"
+                          :key="icon.iconName"
+                          :title="icon.title"
+                          @click="icon.clickMethod">
               <md-icon class="endpointIcons">
                 {{ icon.iconName }}
               </md-icon>
@@ -94,14 +90,15 @@ with this file. If not, see
     </div>
   </div>
 
-  <div class="endpointDiv loading" v-else>
+  <div class="endpointDiv loading"
+       v-else>
     <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
   </div>
 </template>
 
 <script>
 const {
-  spinalPanelManagerService
+  spinalPanelManagerService,
 } = require("spinal-env-viewer-panel-manager-service");
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
@@ -115,30 +112,30 @@ export default {
   name: "endpoint-component",
   props: ["endpointId", "endpointSelected"],
   components: {
-    "popover-component": PopoverComponent
+    "popover-component": PopoverComponent,
   },
   data() {
     this.iconsItems = [
       {
         title: "open Graph Panel",
         clickMethod: this.openGraphPanel,
-        iconName: "show_chart"
+        iconName: "show_chart",
       },
       {
         title: "Documentation",
         clickMethod: this.openDocumentationPanel,
-        iconName: "folder"
+        iconName: "folder",
       },
       {
         title: "Delete",
         clickMethod: this.deleteEndpoint,
-        iconName: "delete"
+        iconName: "delete",
       },
       {
         title: "Download",
         clickMethod: this.download,
-        iconName: "file_download"
-      }
+        iconName: "file_download",
+      },
     ];
     this.bindId;
 
@@ -146,7 +143,7 @@ export default {
       endpointElement: null,
       endpointNode: null,
       endpoint: {},
-      timeseriesItems: []
+      timeseriesItems: [],
     };
   },
   async mounted() {
@@ -177,9 +174,10 @@ export default {
           );
           this.timeseriesItems = getInter;
 
-          let nodeTitle = spinalPanelManagerService.panels.spinal_dashboard_panel.panel.title.innerText.split(
-            ":"
-          );
+          let nodeTitle =
+            spinalPanelManagerService.panels.spinal_dashboard_panel.panel.title.innerText.split(
+              ":"
+            );
           //let splitArray = nodeTitle.split(":");
 
           let excelFileName =
@@ -234,14 +232,14 @@ export default {
     openGraphPanel() {
       console.log(this.endpointNode);
       spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
-        selectedNode: SpinalGraphService.getInfo(this.endpointId)
+        selectedNode: SpinalGraphService.getInfo(this.endpointId),
       });
     },
     openDocumentationPanel() {
       let realNode = SpinalGraphService.getRealNode(this.endpointId);
       let paramSent = {
         selectedNode: realNode,
-        info: realNode.info
+        info: realNode.info,
       };
       paramSent.selectedNode.id = realNode.info.id;
       spinalPanelManagerService.openPanel("panel-documentation", paramSent);
@@ -267,11 +265,17 @@ export default {
         if (spinalPilot) {
           this.bindState(spinalPilot, popovers, value);
         } else {
-          this.endpointElement.currentValue.set(value);
+          const changed = this.changeEndpointValueInGraph(
+            this.endpointElement.currentValue,
+            value
+          );
+
+          if (changed) popovers.map((el) => el.setSuccessMode());
+          else popovers.map((el) => el.setErrorMode());
         }
       } catch (error) {
         console.error(error);
-        popovers.map(el => el.setErrorMode());
+        popovers.map((el) => el.setErrorMode());
       }
     },
 
@@ -279,13 +283,17 @@ export default {
       const bindId = spinalPilot.state.bind(async () => {
         switch (spinalPilot.state.get()) {
           case "success":
-            this.endpointElement.currentValue.set(value);
-            popovers.map(el => el.setSuccessMode());
+            const changed = this.changeEndpointValueInGraph(
+              this.endpointElement.currentValue,
+              value
+            );
+            if (changed) popovers.map((el) => el.setSuccessMode());
+            else popovers.map((el) => el.setErrorMode());
             spinalPilot.state.unbind(bindId);
             await spinalPilot.removeToNode();
             break;
           case "error":
-            popovers.map(el => el.setErrorMode());
+            popovers.map((el) => el.setErrorMode());
             spinalPilot.state.unbind(bindId);
             await spinalPilot.removeToNode();
             break;
@@ -296,6 +304,18 @@ export default {
       });
     },
 
+    changeEndpointValueInGraph(endpointValueModel, newValue) {
+      if (!isNaN(newValue)) newValue = Number(newValue);
+
+      if (
+        typeof newValue === "string" &&
+        (endpointValueModel instanceof Val ||
+          endpointValueModel instanceof Bool)
+      )
+        return false;
+      return endpointValueModel.set(newValue);
+    },
+
     deleteEndpoint() {
       spinalPanelManagerService.openPanel("deleteEndpointDialog", {
         title: "This endpoint will be removed from graph",
@@ -303,14 +323,14 @@ export default {
         callback: async () => {
           await SpinalGraphService.removeFromGraph(this.endpointId);
           this.$emit("removed", this.endpointId);
-        }
+        },
       });
-    }
+    },
   },
   computed: {
     isSelected() {
       return this.endpointSelected === this.endpointId;
-    }
+    },
   },
   filters: {
     formatValue(argCurrentValue) {
@@ -325,12 +345,12 @@ export default {
 
     formatUnit(argUnit) {
       return argUnit && argUnit.length > 0 ? argUnit : "-";
-    }
+    },
   },
 
   beforeDestroy() {
     if (this.endpointElement) this.endpointElement.unbind(this.bindId);
-  }
+  },
 };
 </script>
 
