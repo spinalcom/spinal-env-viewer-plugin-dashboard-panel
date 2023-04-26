@@ -108,6 +108,8 @@ import { SpinalServiceTimeseries } from "spinal-model-timeseries";
 import XLSX from "xlsx";
 import { attributeService } from "spinal-env-viewer-plugin-documentation-service";
 
+const spinalServiceTimeseries = new SpinalServiceTimeseries();
+
 export default {
   name: "endpoint-component",
   props: ["endpointId", "endpointSelected"],
@@ -159,7 +161,6 @@ export default {
     },
 
     async download() {
-      const spinalServiceTimeseries = new SpinalServiceTimeseries();
       //console.log("Hello from download\n");
       //console.log(this.endpointNode.info.endpointId);
       if (this.endpointNode.info.id) {
@@ -270,8 +271,10 @@ export default {
             value
           );
 
-          if (changed) popovers.map((el) => el.setSuccessMode());
-          else popovers.map((el) => el.setErrorMode());
+          if (changed) {
+            popovers.map((el) => el.setSuccessMode());
+            await this.SaveTimeSeries(value);
+          } else popovers.map((el) => el.setErrorMode());
         }
       } catch (error) {
         console.error(error);
@@ -313,6 +316,7 @@ export default {
           endpointValueModel instanceof Bool)
       )
         return false;
+
       return endpointValueModel.set(newValue);
     },
 
@@ -325,6 +329,17 @@ export default {
           this.$emit("removed", this.endpointId);
         },
       });
+    },
+
+    SaveTimeSeries(value) {
+      const save =
+        this.endpointElement.saveTimeSeries &&
+        this.endpointElement.saveTimeSeries.get();
+
+      if (!save) return;
+
+      const endpointId = this.endpointNode.getId().get();
+      return spinalServiceTimeseries.pushFromEndpoint(endpointId, value);
     },
   },
   computed: {
