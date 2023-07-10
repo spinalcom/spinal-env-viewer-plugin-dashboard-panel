@@ -107,12 +107,13 @@ import PopoverComponent from "../popover/popover.vue";
 import { SpinalServiceTimeseries } from "spinal-model-timeseries";
 import XLSX from "xlsx";
 import { attributeService } from "spinal-env-viewer-plugin-documentation-service";
+import NetworkService from "spinal-model-bmsnetwork";
 
 const spinalServiceTimeseries = new SpinalServiceTimeseries();
 
 export default {
   name: "endpoint-component",
-  props: ["endpointId", "endpointSelected"],
+  props: ["endpointId", "endpointSelected", "isControlPoint"],
   components: {
     "popover-component": PopoverComponent,
   },
@@ -236,6 +237,7 @@ export default {
         selectedNode: SpinalGraphService.getInfo(this.endpointId),
       });
     },
+
     openDocumentationPanel() {
       let realNode = SpinalGraphService.getRealNode(this.endpointId);
       let paramSent = {
@@ -266,14 +268,15 @@ export default {
         if (spinalPilot) {
           this.bindState(spinalPilot, popovers, value);
         } else {
-          const changed = this.changeEndpointValueInGraph(
+          const changed = await this.changeEndpointValueInGraph(
             this.endpointElement.currentValue,
             value
           );
 
           if (changed) {
             popovers.map((el) => el.setSuccessMode());
-            await this.SaveTimeSeries(value);
+            this.endpointNode.info.mod_attr("directModificationDate", Date.now());
+            // await this.SaveTimeSeries(value);
           } else popovers.map((el) => el.setErrorMode());
         }
       } catch (error) {
@@ -286,11 +289,16 @@ export default {
       const bindId = spinalPilot.state.bind(async () => {
         switch (spinalPilot.state.get()) {
           case "success":
-            const changed = this.changeEndpointValueInGraph(
+            const changed = await this.changeEndpointValueInGraph(
               this.endpointElement.currentValue,
               value
             );
-            if (changed) popovers.map((el) => el.setSuccessMode());
+            if (changed) {
+              popovers.map((el) => el.setSuccessMode());
+              if (this.endpointNode.info.directModificationDate) this.endpointNode.info.directModificationDate.set(Date.now());
+              else this.endpointNode.info.add_attr({ directModificationDate: Date.now() });
+
+            }
             else popovers.map((el) => el.setErrorMode());
             spinalPilot.state.unbind(bindId);
             await spinalPilot.removeToNode();
@@ -307,17 +315,30 @@ export default {
       });
     },
 
-    changeEndpointValueInGraph(endpointValueModel, newValue) {
+    async changeEndpointValueInGraph(endpointValueModel, newValue) {
       if (!isNaN(newValue)) newValue = Number(newValue);
 
       if (
         typeof newValue === "string" &&
         (endpointValueModel instanceof Val ||
           endpointValueModel instanceof Bool)
-      )
+      ){
         return false;
+      }
 
-      return endpointValueModel.set(newValue);
+      const saveTimeSeries = this.getSaveTimeSeries();
+      const node = SpinalGraphService.getInfo(this.endpointId)
+      const networkService = new NetworkService(saveTimeSeries);
+      const reference = { currentValue: newValue }
+
+      try {
+        await networkService.updateEndpoint(node, reference);
+        return true
+      } catch (error) {
+        return false;
+      }
+
+      // return endpointValueModel.set(newValue);
     },
 
     deleteEndpoint() {
@@ -331,16 +352,22 @@ export default {
       });
     },
 
-    SaveTimeSeries(value) {
-      const save =
-        this.endpointElement.saveTimeSeries &&
-        this.endpointElement.saveTimeSeries.get();
+    getSaveTimeSeries() {
+      if (!this.isControlPoint) return true;
+      const save = this.endpointElement.saveTimeSeries && this.endpointElement.saveTimeSeries.get();
+      return save ? true : false;
+    }
 
-      if (!save) return;
+    // SaveTimeSeries(value) {
+    //   const save =
+    //     this.endpointElement.saveTimeSeries &&
+    //     this.endpointElement.saveTimeSeries.get();
 
-      const endpointId = this.endpointNode.getId().get();
-      return spinalServiceTimeseries.pushFromEndpoint(endpointId, value);
-    },
+    //   if (!save) return;
+
+    //   const endpointId = this.endpointNode.getId().get();
+    //   return spinalServiceTimeseries.pushFromEndpoint(endpointId, value);
+    // },
   },
   computed: {
     isSelected() {

@@ -38,6 +38,7 @@ with this file. If not, see
     </div>
     <div class="main">
       <tab-content-component @removed="removeEndpoint"
+                             :isControlPoint="tabSelected == tabs.controlPoints"
                              :data="contents"
                              :itemCountPerLine="itemCountPerLine">
       </tab-content-component>

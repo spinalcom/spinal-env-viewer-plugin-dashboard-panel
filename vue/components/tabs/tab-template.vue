@@ -44,6 +44,7 @@ with this file. If not, see
                           :key="endpoint.id"
                           :endpointId="endpoint.id"
                           :endpointSelected="endpointSelected"
+                          :isControlPoint="isControlPoint"
                           @select="selectEndpoint"
                           @removed="removeEndpoint"></endpoint-component>
 
@@ -69,6 +70,7 @@ export default {
       type: Number,
       default: 3,
     },
+    isControlPoint: Boolean,
     data: Array,
   },
   components: {
