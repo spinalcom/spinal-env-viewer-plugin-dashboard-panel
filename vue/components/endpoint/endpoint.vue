@@ -263,18 +263,13 @@ export default {
 
       try {
         const id = this.endpointId;
-        const spinalPilot = await pilotageUtilities.sendUpdateRequest(
-          id,
-          this.endpointNode,
-          value
-        );
+        const spinalPilot = await pilotageUtilities.sendUpdateRequest(id, this.endpointNode, value);
+        console.log("spinalPilot", spinalPilot)
         if (spinalPilot) {
           this.bindState(spinalPilot, popovers, value);
+        
         } else {
-          const changed = await this.changeEndpointValueInGraph(
-            this.endpointElement.currentValue,
-            value
-          );
+          const changed = await this.changeEndpointValueInGraph(this.endpointElement.currentValue, value );
 
           if (changed) {
             popovers.map((el) => el.setSuccessMode());

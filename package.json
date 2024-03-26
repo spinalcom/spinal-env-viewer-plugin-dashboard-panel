@@ -1,6 +1,6 @@
 {
   "name": "spinal-env-viewer-plugin-dashboard-panel",
-  "version": "2.2.2",
+  "version": "2.3.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "spinal-model-bacnet": "git+https://github.com/spinalcom/spinal-model-bacnet.git",
     "spinal-model-bmsnetwork": "git+https://github.com/spinalcom/spinal-model-bmsnetwork.git",
     "spinal-models-building-elements": "git+https://github.com/spinalcom/spinal-models-building-elements.git",
+    "spinal-model-opcua": "git+https://github.com/spinalcom/spinal-model-opcua.git",
     "spinal-organ-threshold": "git+https://github.com/spinalcom/spinal-organ-threshold.git",
     "v-tooltip": "^2.1.3",
     "vue-slider-component": "^3.2.13",
