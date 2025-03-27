@@ -1,36 +1,36 @@
 {
-  "name": "spinal-env-viewer-plugin-dashboard-panel",
-  "version": "2.3.2",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "jw-vue-pagination": "^1.0.3",
-    "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
-    "spinal-env-viewer-context-menu-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-menu-service.git",
-    "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
-    "spinal-env-viewer-panel-manager-service": "git+https://github.com/spinalcom/spinal-env-viewer-panel-manager-service.git",
-    "spinal-env-viewer-panel-manager-service_spinalforgeextention": "git+https://github.com/spinalcom/spinal-env-viewer-panel-manager-service_spinalforgeextention.git",
-    "spinal-env-viewer-plugin-bimobjectservice": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-bimobjectservice.git",
-    "spinal-env-viewer-plugin-endpoint_chart_viewer": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-endpoint_chart_viewer.git",
-    "spinal-model-bacnet": "git+https://github.com/spinalcom/spinal-model-bacnet.git",
-    "spinal-model-bmsnetwork": "git+https://github.com/spinalcom/spinal-model-bmsnetwork.git",
-    "spinal-models-building-elements": "git+https://github.com/spinalcom/spinal-models-building-elements.git",
-    "spinal-model-opcua": "git+https://github.com/spinalcom/spinal-model-opcua.git",
-    "spinal-organ-threshold": "git+https://github.com/spinalcom/spinal-organ-threshold.git",
-    "v-tooltip": "^2.1.3",
-    "vue-slider-component": "^3.2.13",
-    "xlsx": "^0.18.5"
-  },
-  "browserify": {
-    "transform": [
-      "vueify",
-      "babelify"
-    ]
-  }
+	"name": "spinal-env-viewer-plugin-dashboard-panel",
+	"version": "2.3.3",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"jw-vue-pagination": "^1.0.3",
+		"spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
+		"spinal-env-viewer-context-menu-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-menu-service.git",
+		"spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
+		"spinal-env-viewer-panel-manager-service": "git+https://github.com/spinalcom/spinal-env-viewer-panel-manager-service.git",
+		"spinal-env-viewer-panel-manager-service_spinalforgeextention": "git+https://github.com/spinalcom/spinal-env-viewer-panel-manager-service_spinalforgeextention.git",
+		"spinal-env-viewer-plugin-bimobjectservice": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-bimobjectservice.git",
+		"spinal-env-viewer-plugin-endpoint_chart_viewer": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-endpoint_chart_viewer.git",
+		"spinal-model-bacnet": "git+https://github.com/spinalcom/spinal-model-bacnet.git",
+		"spinal-model-bmsnetwork": "git+https://github.com/spinalcom/spinal-model-bmsnetwork.git",
+		"spinal-models-building-elements": "git+https://github.com/spinalcom/spinal-models-building-elements.git",
+		"spinal-model-opcua": "git+https://github.com/spinalcom/spinal-model-opcua.git",
+		"spinal-organ-threshold": "git+https://github.com/spinalcom/spinal-organ-threshold.git",
+		"v-tooltip": "^2.1.3",
+		"vue-slider-component": "^3.2.13",
+		"xlsx": "^0.18.5"
+	},
+	"browserify": {
+		"transform": [
+			"vueify",
+			"babelify"
+		]
+	}
 }

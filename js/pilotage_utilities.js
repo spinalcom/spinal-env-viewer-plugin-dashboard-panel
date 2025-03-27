@@ -1,11 +1,11 @@
 import { SpinalGraphService } from "spinal-env-viewer-graph-service"
 import { SpinalBmsNetwork, SpinalBmsDevice, SpinalBmsEndpoint, SpinalBmsEndpointGroup } from "spinal-model-bmsnetwork";
 import { BACNET_ORGAN_TYPE, SpinalPilotModel } from 'spinal-model-bacnet';
-import { OPCUA_ORGAN_TYPE, SpinalOPCUAPilot  } from "spinal-model-opcua";
+import { OPCUA_ORGAN_TYPE, SpinalOPCUAPilot } from "spinal-model-opcua";
 
 export default {
    getEndpointOrgan(endpointNodeId) {
-      const organTypes = [BACNET_ORGAN_TYPE, OPCUA_ORGAN_TYPE ]
+      const organTypes = [BACNET_ORGAN_TYPE, OPCUA_ORGAN_TYPE]
       return this.findParents(endpointNodeId, [SpinalBmsNetwork.relationName, SpinalBmsDevice.relationName, SpinalBmsEndpoint.relationName, SpinalBmsEndpointGroup.relationName], (node => {
          if (organTypes.includes(node.getType().get())) {
             SpinalGraphService._addNode(node);
@@ -64,7 +64,7 @@ export default {
                promises.push(node.getParents(relations));
                if (predicate(node)) {
                   found.push(node);
-                  if(stopAtFirstFound) break;
+                  if (stopAtFirstFound) break;
                }
             }
             const parentArrays = await Promise.all(promises);
@@ -92,15 +92,15 @@ export default {
       const devices = await this.getDevices(nodeId);
 
       if (organNode && devices && devices.length > 0) {
-            switch (organNode.getType().get()) {
-               case BACNET_ORGAN_TYPE:
-                  const organ = await organNode.getElement();
-                  return this.sendBacnetRequest(organ, endpointNode, devices, value);
-               case OPCUA_ORGAN_TYPE:
-                     return this.sendOPCUARequest(organNode, endpointNode, value);
-               default:
-                  break;
-            }
+         switch (organNode.getType().get()) {
+            case BACNET_ORGAN_TYPE:
+               const organ = await organNode.getElement();
+               return this.sendBacnetRequest(organ, endpointNode, devices, value);
+            case OPCUA_ORGAN_TYPE:
+               return this.sendOPCUARequest(organNode, endpointNode, value);
+            default:
+               break;
+         }
 
       }
    },
@@ -112,6 +112,7 @@ export default {
          return {
             address: device.info.address && device.info.address.get(),
             deviceId: device.info.idNetwork && device.info.idNetwork.get(),
+            SADR: device.info.SADR && device.info.SADR.get(),
             objectId: {
                type: endpointElement.typeId.get(),
                instance: endpointElement.id.get(),
