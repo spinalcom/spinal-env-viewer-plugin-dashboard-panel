@@ -97,7 +97,7 @@ export default {
                const organ = await organNode.getElement();
                return this.sendBacnetRequest(organ, endpointNode, devices, value);
             case OPCUA_ORGAN_TYPE:
-               return this.sendOPCUARequest(organNode, endpointNode, value);
+               return this.sendOPCUARequest(organNode, endpointNode, value, devices);
             default:
                break;
          }
@@ -126,13 +126,18 @@ export default {
       return spinalPilot;
    },
 
-   async sendOPCUARequest(organ, endpointNode, value) {
-      const [network] = await this.getNetwork(endpointNode.getId().get())
-      const request = {
+   async sendOPCUARequest(organ, endpointNode, value, devices) {
+      // const [network] = await this.getNetwork(endpointNode.getId().get())
+      const request = devices.map((device) => ({
          nodeId: endpointNode.info.idNetwork && endpointNode.info.idNetwork.get(),
          value,
-         networkInfo: (network.info.serverInfo && network.info.serverInfo.get()) || {}
-      }
+         networkInfo: (device.info.server && device.info.server.get()) || {}
+      }));
+      // const request = {
+      //    nodeId: endpointNode.info.idNetwork && endpointNode.info.idNetwork.get(),
+      //    value,
+      //    networkInfo: (network.info.serverInfo && network.info.serverInfo.get()) || {}
+      // }
 
       const spinalPilot = new SpinalOPCUAPilot(organ, request);
       await spinalPilot.addToNode(endpointNode);
