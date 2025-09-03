@@ -34,10 +34,12 @@ with this file. If not, see
       <div class="endpoint_popover_container">
         <div class="popover-content"
              v-if="state === STATES.normal">
-          <number-component v-if="type === TYPES.number"
-                            :data="data"></number-component>
-          <boolean-component v-else-if="type === TYPES.boolean"
-                             :data="data"></boolean-component>
+             
+             <boolean-component v-if="type === TYPES.boolean"
+             :data="data"></boolean-component>
+
+             <text-component v-else
+                               :data="data"></text-component>
         </div>
 
         <div class="popover-content"
@@ -81,18 +83,22 @@ with this file. If not, see
 
 <script>
 import booleanComponent from "./boolean.vue";
-import numberComponent from "./number.vue";
+import textComponent from "./text.vue";
 
 export default {
   name: "popoverComponent",
   components: {
     "boolean-component": booleanComponent,
-    "number-component": numberComponent,
+    "text-component": textComponent,
   },
   props: {
     show: {
       type: Boolean,
       default: false,
+    },
+    dataType: {
+      type: String,
+      default: "string",
     },
     defaultValue: Number | Boolean | String,
   },
@@ -101,7 +107,7 @@ export default {
     this.TYPES = {
       string: 0,
       boolean: 1,
-      number: 2,
+      // number: 2,
     };
 
     this.STATES = {
@@ -121,7 +127,10 @@ export default {
   },
   mounted() {
     this.data.value = this.defaultValue;
-    this.type = this.TYPES[typeof this.data.value];
+    this.type = this.TYPES.string;
+
+    if(this.dataType.toLowerCase() === "boolean") this.type = this.TYPES.boolean;
+
     this.state = this.STATES.normal;
   },
   methods: {

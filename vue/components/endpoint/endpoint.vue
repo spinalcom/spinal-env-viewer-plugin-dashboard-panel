@@ -54,11 +54,14 @@ with this file. If not, see
           </md-icon>
         </md-button>
       </template>
+
       <popover-component
         ref="popover"
         :defaultValue="endpoint.currentValue"
+        :dataType="endpoint.dataType"
         @update="update"
       ></popover-component>
+
       <template v-if="iconsItems.length >= 3">
         <md-menu md-size="small">
           <md-button md-menu-trigger class="md-icon-button">
