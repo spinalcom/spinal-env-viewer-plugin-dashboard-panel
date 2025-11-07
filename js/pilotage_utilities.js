@@ -122,7 +122,7 @@ export default {
       });
 
       const spinalPilot = new SpinalPilotModel(organ, requests);
-      await spinalPilot.addToNode(endpointNode);
+      await spinalPilot.addToGraph(endpointNode);
       return spinalPilot;
    },
 
@@ -140,7 +140,7 @@ export default {
       // }
 
       const spinalPilot = new SpinalOPCUAPilot(organ, request);
-      await spinalPilot.addToNode(endpointNode);
+      await spinalPilot.addToGraph(endpointNode);
       return spinalPilot;
    }
 

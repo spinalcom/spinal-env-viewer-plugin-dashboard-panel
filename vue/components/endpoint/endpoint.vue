@@ -23,12 +23,7 @@ with this file. If not, see
 -->
 
 <template>
-  <div
-    class="endpointDiv"
-    :class="{ selected: isSelected }"
-    @click="selectEndpoint"
-    v-if="endpoint"
-  >
+  <div class="endpointDiv" :class="{ selected: isSelected }" @click="selectEndpoint" v-if="endpoint">
     <div class="name" v-tooltip="endpoint.name">{{ endpoint.name }}</div>
     <div class="values">
       <div class="value" v-tooltip="endpoint.currentValue">
@@ -42,25 +37,16 @@ with this file. If not, see
 
     <div class="btnGroup">
       <template v-if="iconsItems.length < 3">
-        <md-button
-          v-for="icon in iconsItems"
-          :key="icon.iconName"
-          class="md-icon-button md-dense"
-          :title="icon.title"
-          @click="icon.clickMethod"
-        >
+        <md-button v-for="icon in iconsItems" :key="icon.iconName" class="md-icon-button md-dense" :title="icon.title"
+          @click="icon.clickMethod">
           <md-icon class="endpointIcons">
             {{ icon.iconName }}
           </md-icon>
         </md-button>
       </template>
 
-      <popover-component
-        ref="popover"
-        :defaultValue="endpoint.currentValue"
-        :dataType="endpoint.dataType"
-        @update="update"
-      ></popover-component>
+      <popover-component ref="popover" :defaultValue="endpoint.currentValue" :dataType="endpoint.dataType"
+        @update="update"></popover-component>
 
       <template v-if="iconsItems.length >= 3">
         <md-menu md-size="small">
@@ -69,13 +55,8 @@ with this file. If not, see
           </md-button>
 
           <md-menu-content>
-            <md-menu-item
-              v-for="icon in iconsItems"
-              class="endpointMenuItem"
-              :key="icon.iconName"
-              :title="icon.title"
-              @click="icon.clickMethod"
-            >
+            <md-menu-item v-for="icon in iconsItems" class="endpointMenuItem" :key="icon.iconName" :title="icon.title"
+              @click="icon.clickMethod">
               <md-icon class="endpointIcons">
                 {{ icon.iconName }}
               </md-icon>
@@ -270,9 +251,9 @@ export default {
         console.log("spinalPilot", spinalPilot)
         if (spinalPilot) {
           this.bindState(spinalPilot, popovers, value);
-        
+
         } else {
-          const changed = await this.changeEndpointValueInGraph(this.endpointElement.currentValue, value );
+          const changed = await this.changeEndpointValueInGraph(this.endpointElement.currentValue, value);
 
           if (changed) {
             popovers.map((el) => el.setSuccessMode());
@@ -307,12 +288,12 @@ export default {
                 });
             } else popovers.map((el) => el.setErrorMode());
             spinalPilot.state.unbind(bindId);
-            await spinalPilot.removeToNode();
+            await spinalPilot.removeFromGraph();
             break;
           case 'error':
             popovers.map((el) => el.setErrorMode());
             spinalPilot.state.unbind(bindId);
-            await spinalPilot.removeToNode();
+            await spinalPilot.removeFromGraph();
             break;
 
           default:
@@ -458,6 +439,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .endpointDiv .values .unit {
   width: 50%;
   height: 40%;
