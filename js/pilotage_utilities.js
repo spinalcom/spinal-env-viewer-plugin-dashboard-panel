@@ -130,6 +130,7 @@ export default {
       // const [network] = await this.getNetwork(endpointNode.getId().get())
       const request = devices.map((device) => ({
          nodeId: endpointNode.info.idNetwork && endpointNode.info.idNetwork.get(),
+         path: device.info.path && device.info.path.get(),
          value,
          networkInfo: (device.info.server && device.info.server.get()) || {}
       }));
