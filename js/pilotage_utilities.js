@@ -2,10 +2,11 @@ import { SpinalGraphService } from "spinal-env-viewer-graph-service"
 import { SpinalBmsNetwork, SpinalBmsDevice, SpinalBmsEndpoint, SpinalBmsEndpointGroup } from "spinal-model-bmsnetwork";
 import { BACNET_ORGAN_TYPE, SpinalPilotModel } from 'spinal-model-bacnet';
 import { OPCUA_ORGAN_TYPE, SpinalOPCUAPilot } from "spinal-model-opcua";
+import { SNMP_ORGAN_TYPE, SpinalSNMPPilot } from "spinal-model-snmp";
 
 export default {
    getEndpointOrgan(endpointNodeId) {
-      const organTypes = [BACNET_ORGAN_TYPE, OPCUA_ORGAN_TYPE]
+      const organTypes = [BACNET_ORGAN_TYPE, OPCUA_ORGAN_TYPE, SNMP_ORGAN_TYPE];
       return this.findParents(endpointNodeId, [SpinalBmsNetwork.relationName, SpinalBmsDevice.relationName, SpinalBmsEndpoint.relationName, SpinalBmsEndpointGroup.relationName], (node => {
          if (organTypes.includes(node.getType().get())) {
             SpinalGraphService._addNode(node);
@@ -98,6 +99,9 @@ export default {
                return this.sendBacnetRequest(organ, endpointNode, devices, value);
             case OPCUA_ORGAN_TYPE:
                return this.sendOPCUARequest(organNode, endpointNode, value, devices);
+
+            case SNMP_ORGAN_TYPE:
+               return this.sendSNMPRequest(organNode, endpointNode, value, devices);
             default:
                break;
          }
@@ -142,6 +146,22 @@ export default {
 
       const spinalPilot = new SpinalOPCUAPilot(organ, request);
       await spinalPilot.addToGraph(endpointNode);
+      return spinalPilot;
+   },
+
+   async sendSNMPRequest(organNode, endpointNode, value, devices) {
+      const deviceElement = await devices[0].getElement();
+      const endpointElement = await endpointNode.getElement();
+
+      const request = devices.map((device) => ({
+         oid: endpointElement.id && endpointElement.id.get(),
+         value,
+         type: endpointElement.dataType && endpointElement.dataType.get(),
+         address: deviceElement.address && deviceElement.address.get(),
+      }))
+
+      const spinalPilot = new SpinalSNMPPilot(organNode, request);
+      spinalPilot.addToGraph(endpointNode);
       return spinalPilot;
    }
 
