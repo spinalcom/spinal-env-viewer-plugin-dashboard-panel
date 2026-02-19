@@ -134,15 +134,10 @@ export default {
       // const [network] = await this.getNetwork(endpointNode.getId().get())
       const request = devices.map((device) => ({
          nodeId: endpointNode.info.idNetwork && endpointNode.info.idNetwork.get(),
-         path: device.info.path && device.info.path.get(),
+         path: endpointNode.info.path && endpointNode.info.path.get(),
          value,
          networkInfo: (device.info.server && device.info.server.get()) || {}
       }));
-      // const request = {
-      //    nodeId: endpointNode.info.idNetwork && endpointNode.info.idNetwork.get(),
-      //    value,
-      //    networkInfo: (network.info.serverInfo && network.info.serverInfo.get()) || {}
-      // }
 
       const spinalPilot = new SpinalOPCUAPilot(organ, request);
       await spinalPilot.addToGraph(endpointNode);
