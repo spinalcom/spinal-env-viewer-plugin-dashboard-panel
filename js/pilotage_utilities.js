@@ -95,8 +95,9 @@ export default {
       if (organNode && devices && devices.length > 0) {
          switch (organNode.getType().get()) {
             case BACNET_ORGAN_TYPE:
-               const organ = await organNode.getElement();
-               return this.sendBacnetRequest(organ, endpointNode, devices, value);
+               // const organ = await organNode.getElement();
+               return this.sendBacnetRequest(organNode, endpointNode, devices, value);
+
             case OPCUA_ORGAN_TYPE:
                return this.sendOPCUARequest(organNode, endpointNode, value, devices);
 
@@ -109,7 +110,7 @@ export default {
       }
    },
 
-   async sendBacnetRequest(organ, endpointNode, devices, value) {
+   async sendBacnetRequest(organNode, endpointNode, devices, value) {
       const endpointElement = await endpointNode.getElement();
 
       const requests = devices.map((device) => {
@@ -117,29 +118,26 @@ export default {
             address: device.info.address && device.info.address.get(),
             deviceId: device.info.idNetwork && device.info.idNetwork.get(),
             SADR: device.info.SADR && device.info.SADR.get(),
-            objectId: {
-               type: endpointElement.typeId.get(),
-               instance: endpointElement.id.get(),
-            },
+            objectId: { type: endpointElement.typeId.get(), instance: endpointElement.id.get() },
             value: value,
          };
       });
 
-      const spinalPilot = new SpinalPilotModel(organ, requests);
+      const spinalPilot = new SpinalPilotModel(organNode, requests);
       await spinalPilot.addToGraph(endpointNode);
       return spinalPilot;
    },
 
-   async sendOPCUARequest(organ, endpointNode, value, devices) {
+   async sendOPCUARequest(organNode, endpointNode, value, devices) {
       // const [network] = await this.getNetwork(endpointNode.getId().get())
       const request = devices.map((device) => ({
          nodeId: endpointNode.info.idNetwork && endpointNode.info.idNetwork.get(),
          path: endpointNode.info.path && endpointNode.info.path.get(),
+         networkInfo: (device.info.server && device.info.server.get()) || {},
          value,
-         networkInfo: (device.info.server && device.info.server.get()) || {}
       }));
 
-      const spinalPilot = new SpinalOPCUAPilot(organ, request);
+      const spinalPilot = new SpinalOPCUAPilot(organNode, request);
       await spinalPilot.addToGraph(endpointNode);
       return spinalPilot;
    },
@@ -150,13 +148,13 @@ export default {
 
       const request = devices.map((device) => ({
          oid: endpointElement.id && endpointElement.id.get(),
-         value,
          type: endpointElement.dataType && endpointElement.dataType.get(),
          address: deviceElement.address && deviceElement.address.get(),
+         value,
       }))
 
       const spinalPilot = new SpinalSNMPPilot(organNode, request);
-      spinalPilot.addToGraph(endpointNode);
+      await spinalPilot.addToGraph(endpointNode);
       return spinalPilot;
    }
 

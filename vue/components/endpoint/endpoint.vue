@@ -84,47 +84,45 @@ with this file. If not, see
 </template>
 
 <script>
-const {
-  spinalPanelManagerService,
-} = require('spinal-env-viewer-panel-manager-service');
+const { spinalPanelManagerService } = require("spinal-env-viewer-panel-manager-service");
 
-import { SpinalGraphService } from 'spinal-env-viewer-graph-service';
-import pilotageUtilities from '../../../js/pilotage_utilities';
-import PopoverComponent from '../popover/popover.vue';
-import { SpinalServiceTimeseries } from 'spinal-model-timeseries';
-import { utils, writeFile } from 'xlsx';
-import { attributeService } from 'spinal-env-viewer-plugin-documentation-service';
-import NetworkService from 'spinal-model-bmsnetwork';
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import pilotageUtilities from "../../../js/pilotage_utilities";
+import PopoverComponent from "../popover/popover.vue";
+import { SpinalServiceTimeseries } from "spinal-model-timeseries";
+import { utils, writeFile } from "xlsx";
+import { attributeService } from "spinal-env-viewer-plugin-documentation-service";
+import NetworkService from "spinal-model-bmsnetwork";
 
 const spinalServiceTimeseries = new SpinalServiceTimeseries();
 
 export default {
-  name: 'endpoint-component',
-  props: ['endpointId', 'endpointSelected', 'isControlPoint'],
+  name: "endpoint-component",
+  props: ["endpointId", "endpointSelected", "isControlPoint"],
   components: {
-    'popover-component': PopoverComponent,
+    "popover-component": PopoverComponent,
   },
   data() {
     this.iconsItems = [
       {
-        title: 'open Graph Panel',
+        title: "open Graph Panel",
         clickMethod: this.openGraphPanel,
-        iconName: 'show_chart',
+        iconName: "show_chart",
       },
       {
-        title: 'Documentation',
+        title: "Documentation",
         clickMethod: this.openDocumentationPanel,
-        iconName: 'folder',
+        iconName: "folder",
       },
       {
-        title: 'Delete',
+        title: "Delete",
         clickMethod: this.deleteEndpoint,
-        iconName: 'delete',
+        iconName: "delete",
       },
       {
-        title: 'Download',
+        title: "Download",
         clickMethod: this.download,
-        iconName: 'file_download',
+        iconName: "file_download",
       },
     ];
     this.bindId;
@@ -138,50 +136,36 @@ export default {
   },
   async mounted() {
     this.endpointNode = SpinalGraphService.getRealNode(this.endpointId);
-    this.endpointElement =
-      this.endpointNode && (await this.endpointNode.getElement());
+    this.endpointElement = this.endpointNode && (await this.endpointNode.getElement());
 
     this.bindEndpointElement();
   },
   methods: {
     selectEndpoint() {
-      this.$emit('select', this.endpointId);
+      this.$emit("select", this.endpointId);
     },
 
     async download() {
       //console.log("Hello from download\n");
       //console.log(this.endpointNode.info.endpointId);
       if (this.endpointNode.info.id) {
-        let getTSvar = await spinalServiceTimeseries.getTimeSeries(
-          this.endpointNode.info.id
-        );
+        let getTSvar = await spinalServiceTimeseries.getTimeSeries(this.endpointNode.info.id);
         //console.log(getTSvar);
         if (getTSvar) {
-          console.log('defined endpoint timeseries');
-          let getInter = await spinalServiceTimeseries.getFromIntervalTime(
-            getTSvar
-          );
+          console.log("defined endpoint timeseries");
+          let getInter = await spinalServiceTimeseries.getFromIntervalTime(getTSvar);
           this.timeseriesItems = getInter;
 
-          let nodeTitle =
-            spinalPanelManagerService.panels.spinal_dashboard_panel.panel.title.innerText.split(
-              ':'
-            );
+          let nodeTitle = spinalPanelManagerService.panels.spinal_dashboard_panel.panel.title.innerText.split(":");
           //let splitArray = nodeTitle.split(":");
 
-          let excelFileName =
-            nodeTitle[nodeTitle.length - 1] +
-            '_' +
-            this.endpointNode.info.name.get();
+          let excelFileName = nodeTitle[nodeTitle.length - 1] + "_" + this.endpointNode.info.name.get();
 
-          let getUnit = await attributeService.getAttributesByCategory(
-            this.endpointNode,
-            'default',
-            'unit'
-          );
+          let getUnit = await attributeService.getAttributesByCategory(this.endpointNode, "default", "unit");
 
           const filename = `${excelFileName}.xlsx`.trim();
-          console.log('this is unit: ', getUnit[0].value.get());
+
+          console.log("this is unit: ", getUnit[0].value.get());
           let unit = getUnit[0].value.get();
 
           for (let el of this.timeseriesItems) {
@@ -193,34 +177,34 @@ export default {
 
           const data = utils.json_to_sheet(this.timeseriesItems);
           const wb = utils.book_new();
-          utils.book_append_sheet(wb, data, 'endpoint_controlpoint');
+          utils.book_append_sheet(wb, data, "endpoint_controlpoint");
           writeFile(wb, filename);
         } else {
-          console.log('undefined endpoint timeseries');
+          console.log("undefined endpoint timeseries");
         }
 
         //console.log(getInter);
       }
 
       /* let parentEndpoint = await SpinalGraphService.getRealNode(
-        this.endpointId
-      ).getParents();
-      console.log("this is parent: \n");
-      console.log(parentEndpoint[0].info.name);
-      let parentOfParent = await parentEndpoint[0].getParents();
-      for (let par of parentOfParent) {
-        if (par) {
-          if (par.info.type == "geographicFloor") {
-            console.log("this is floor wanted : \n");
-            console.log(par.info.name.get());
-          }
+      this.endpointId
+    ).getParents();
+    console.log("this is parent: \n");
+    console.log(parentEndpoint[0].info.name);
+    let parentOfParent = await parentEndpoint[0].getParents();
+    for (let par of parentOfParent) {
+      if (par) {
+        if (par.info.type == "geographicFloor") {
+          console.log("this is floor wanted : \n");
+          console.log(par.info.name.get());
         }
-      } */
+      }
+    } */
     },
 
     openGraphPanel() {
       console.log(this.endpointNode);
-      spinalPanelManagerService.openPanel('endpoint_chart_viewer', {
+      spinalPanelManagerService.openPanel("endpoint_chart_viewer", {
         selectedNode: SpinalGraphService.getInfo(this.endpointId),
       });
     },
@@ -232,7 +216,7 @@ export default {
         info: realNode.info,
       };
       paramSent.selectedNode.id = realNode.info.id;
-      spinalPanelManagerService.openPanel('panel-documentation', paramSent);
+      spinalPanelManagerService.openPanel("panel-documentation", paramSent);
     },
 
     bindEndpointElement() {
@@ -242,27 +226,29 @@ export default {
     },
 
     async update(value) {
-      const p = this.$refs['popover'];
+      const p = this.$refs["popover"];
       const popovers = Array.isArray(p) ? p : [p];
 
       try {
         const id = this.endpointId;
+
+        // try to update value through spinalPilot, if endpoint is binded to a pilot, otherwise update directly in graph
         const spinalPilot = await pilotageUtilities.sendUpdateRequest(id, this.endpointNode, value);
-        console.log("spinalPilot", spinalPilot)
+
+        // if spinalPilot is defined, it means that the endpoint is linked to an organ
+        // in this case, we bind the update process to the spinalPilot state
         if (spinalPilot) {
           this.bindState(spinalPilot, popovers, value);
+          return;
+        }
 
+        const changed = await this.changeEndpointValueInGraph(this.endpointElement.currentValue, value);
+
+        if (changed) {
+          popovers.map((el) => el.setSuccessMode());
+          this.endpointNode.info.directModificationDate && this.endpointNode.info.directModificationDate.set(Date.now());
         } else {
-          const changed = await this.changeEndpointValueInGraph(this.endpointElement.currentValue, value);
-
-          if (changed) {
-            popovers.map((el) => el.setSuccessMode());
-            this.endpointNode.info.mod_attr(
-              'directModificationDate',
-              Date.now()
-            );
-            // await this.SaveTimeSeries(value);
-          } else popovers.map((el) => el.setErrorMode());
+          popovers.map((el) => el.setErrorMode());
         }
       } catch (error) {
         console.error(error);
@@ -273,24 +259,20 @@ export default {
     bindState(spinalPilot, popovers, value) {
       const bindId = spinalPilot.state.bind(async () => {
         switch (spinalPilot.state.get()) {
-          case 'success':
-            const changed = await this.changeEndpointValueInGraph(
-              this.endpointElement.currentValue,
-              value
-            );
+          case "success":
+            const changed = await this.changeEndpointValueInGraph(this.endpointElement.currentValue, value);
             if (changed) {
               popovers.map((el) => el.setSuccessMode());
-              if (this.endpointNode.info.directModificationDate)
-                this.endpointNode.info.directModificationDate.set(Date.now());
-              else
-                this.endpointNode.info.add_attr({
-                  directModificationDate: Date.now(),
-                });
-            } else popovers.map((el) => el.setErrorMode());
+              if (this.endpointNode.info.directModificationDate) this.endpointNode.info.directModificationDate.set(Date.now());
+            } else {
+              popovers.map((el) => el.setErrorMode());
+            }
+
             spinalPilot.state.unbind(bindId);
             await spinalPilot.removeFromGraph();
             break;
-          case 'error':
+
+          case "error":
             popovers.map((el) => el.setErrorMode());
             spinalPilot.state.unbind(bindId);
             await spinalPilot.removeFromGraph();
@@ -305,11 +287,7 @@ export default {
     async changeEndpointValueInGraph(endpointValueModel, newValue) {
       if (!isNaN(newValue)) newValue = Number(newValue);
 
-      if (
-        typeof newValue === 'string' &&
-        (endpointValueModel instanceof Val ||
-          endpointValueModel instanceof Bool)
-      ) {
+      if (typeof newValue === "string" && (endpointValueModel instanceof Val || endpointValueModel instanceof Bool)) {
         return false;
       }
 
@@ -329,21 +307,19 @@ export default {
     },
 
     deleteEndpoint() {
-      spinalPanelManagerService.openPanel('deleteEndpointDialog', {
-        title: 'This endpoint will be removed from graph',
+      spinalPanelManagerService.openPanel("deleteEndpointDialog", {
+        title: "This endpoint will be removed from graph",
         message: "You won't be able to revert this!",
         callback: async () => {
           await SpinalGraphService.removeFromGraph(this.endpointId);
-          this.$emit('removed', this.endpointId);
+          this.$emit("removed", this.endpointId);
         },
       });
     },
 
     getSaveTimeSeries() {
       if (!this.isControlPoint) return true;
-      const save =
-        this.endpointElement.saveTimeSeries &&
-        this.endpointElement.saveTimeSeries.get();
+      const save = this.endpointElement.saveTimeSeries && this.endpointElement.saveTimeSeries.get();
       return save ? true : false;
     },
 
@@ -366,16 +342,12 @@ export default {
   filters: {
     formatValue(argCurrentValue) {
       var argCurrentValueNumber = Number(argCurrentValue);
-      if (
-        !isNaN(argCurrentValueNumber) &&
-        !Number.isInteger(argCurrentValueNumber)
-      )
-        return Number(argCurrentValue).toFixed(2);
+      if (!isNaN(argCurrentValueNumber) && !Number.isInteger(argCurrentValueNumber)) return Number(argCurrentValue).toFixed(2);
       return argCurrentValue;
     },
 
     formatUnit(argUnit) {
-      return argUnit && argUnit.length > 0 ? argUnit : '-';
+      return argUnit && argUnit.length > 0 ? argUnit : "-";
     },
   },
 
