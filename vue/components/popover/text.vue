@@ -24,10 +24,20 @@ with this file. If not, see
 
 <template>
 	<div class="data-content">
-		<md-field>
-			<label>value</label>
-			<md-input v-model="data.value"></md-input>
-		</md-field>
+		<div>
+			<md-field>
+				<label>value</label>
+				<md-input v-model="data.value"></md-input>
+			</md-field>
+		</div>
+
+		<div>
+			<md-field>
+				<label>priority</label>
+				<md-input type="number" v-model="data.priority"></md-input>
+			</md-field>
+		</div>
+
 
 		<!-- <div class="slider">
 			<vue-slider
@@ -40,36 +50,37 @@ with this file. If not, see
 </template>
 
 <script>
-	import vueSlider from "vue-slider-component";
+import vueSlider from "vue-slider-component";
 
-	export default {
-		name: "numberComponent",
-		components: {
-			"vue-slider": vueSlider,
-		},
-		props: {
-			data: {},
-		},
-		data() {
-			return {
-				option: {
-					min: -2000,
-					max: 2000,
-					interval: 1,
-					tooltip: "hover",
-					tooltipPlacement: "bottom",
-				},
-			};
-		},
-		methods: {},
-	};
+export default {
+	name: "textComponent",
+	components: {
+		"vue-slider": vueSlider,
+	},
+	props: {
+		data: {},
+	},
+	data() {
+		return {
+			option: {
+				min: -2000,
+				max: 2000,
+				interval: 1,
+				tooltip: "hover",
+				tooltipPlacement: "bottom",
+			},
+		};
+	},
+	methods: {},
+};
 </script>
 
 <style scoped>
-	.data-content {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-	}
+.data-content {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
 </style>

@@ -88,7 +88,7 @@ export default {
       return []
    },
 
-   async sendUpdateRequest(nodeId, endpointNode, value) {
+   async sendUpdateRequest(nodeId, endpointNode, value, priority) {
       const [organNode] = await this.getEndpointOrgan(nodeId);
       const devices = await this.getDevices(nodeId);
 
@@ -96,7 +96,7 @@ export default {
          switch (organNode.getType().get()) {
             case BACNET_ORGAN_TYPE:
                // const organ = await organNode.getElement();
-               return this.sendBacnetRequest(organNode, endpointNode, devices, value);
+               return this.sendBacnetRequest(organNode, endpointNode, devices, value, priority);
 
             case OPCUA_ORGAN_TYPE:
                return this.sendOPCUARequest(organNode, endpointNode, value, devices);
@@ -110,7 +110,7 @@ export default {
       }
    },
 
-   async sendBacnetRequest(organNode, endpointNode, devices, value) {
+   async sendBacnetRequest(organNode, endpointNode, devices, value, priority = 16) {
       const endpointElement = await endpointNode.getElement();
 
       const requests = devices.map((device) => {
@@ -120,6 +120,7 @@ export default {
             SADR: device.info.SADR && device.info.SADR.get(),
             objectId: { type: endpointElement.typeId.get(), instance: endpointElement.id.get() },
             value: value,
+            priority
          };
       });
 

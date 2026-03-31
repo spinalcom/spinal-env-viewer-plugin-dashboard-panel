@@ -64,16 +64,6 @@ with this file. If not, see
             </md-menu-item>
           </md-menu-content>
         </md-menu>
-
-        <!-- <md-button v-for="icon in iconsItems"
-                   :key="icon.iconName"
-                   class="md-icon-button md-dense"
-                   :title="icon.title"
-                   @click="icon.clickMethod">
-          <md-icon class="endpointIcons">
-            {{ icon.iconName }}
-          </md-icon>
-        </md-button> -->
       </template>
     </div>
   </div>
@@ -225,7 +215,7 @@ export default {
       });
     },
 
-    async update(value) {
+    async update({ value, priority }) {
       const p = this.$refs["popover"];
       const popovers = Array.isArray(p) ? p : [p];
 
@@ -233,7 +223,7 @@ export default {
         const id = this.endpointId;
 
         // try to update value through spinalPilot, if endpoint is binded to a pilot, otherwise update directly in graph
-        const spinalPilot = await pilotageUtilities.sendUpdateRequest(id, this.endpointNode, value);
+        const spinalPilot = await pilotageUtilities.sendUpdateRequest(id, this.endpointNode, value, priority);
 
         // if spinalPilot is defined, it means that the endpoint is linked to an organ
         // in this case, we bind the update process to the spinalPilot state

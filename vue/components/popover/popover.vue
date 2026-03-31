@@ -23,42 +23,35 @@ with this file. If not, see
 -->
 
 <template>
-  <v-popover offset="16"
-             @hide="setNormalMode">
-    <md-button class="md-icon-button md-dense tooltip-target b3"
-               title="Update">
+  <v-popover offset="16" @hide="setNormalMode">
+    <md-button class="md-icon-button md-dense tooltip-target b3" title="Update">
       <md-icon class="endpointIcons">edit </md-icon>
     </md-button>
 
     <template slot="popover">
       <div class="endpoint_popover_container">
-        <div class="popover-content"
-             v-if="state === STATES.normal">
-             
-             <boolean-component v-if="type === TYPES.boolean"
-             :data="data"></boolean-component>
+        <div class="popover-content" v-if="state === STATES.normal">
 
-             <text-component v-else
-                               :data="data"></text-component>
+          <boolean-component v-if="type === TYPES.boolean" :data="data"></boolean-component>
+
+          <text-component v-else :data="data"></text-component>
+
+
         </div>
 
-        <div class="popover-content"
-             v-else>
-          <div class="state-content"
-               v-if="state === STATES.processing">
+        <div class="popover-content" v-else>
+          <div class="state-content" v-if="state === STATES.processing">
             <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
           </div>
 
-          <div class="state-content"
-               v-else-if="state === STATES.error">
+          <div class="state-content" v-else-if="state === STATES.error">
             <div>
               <md-icon class="error md-size-3x">close</md-icon>
             </div>
             <div class="error">error</div>
           </div>
 
-          <div class="state-content"
-               v-else-if="state === STATES.success">
+          <div class="state-content" v-else-if="state === STATES.success">
             <div>
               <md-icon class="success md-size-3x">check</md-icon>
             </div>
@@ -67,14 +60,11 @@ with this file. If not, see
         </div>
 
         <div class="actions">
-          <md-button v-close-popover
-                     class="md-dense md-accent">
+          <md-button v-close-popover class="md-dense md-accent">
             Close
           </md-button>
 
-          <md-button class="md-dense md-primary"
-                     :disabled="state !== STATES.normal"
-                     @click="update">Update</md-button>
+          <md-button class="md-dense md-primary" :disabled="state !== STATES.normal" @click="update">Update</md-button>
         </div>
       </div>
     </template>
@@ -120,6 +110,7 @@ export default {
     return {
       data: {
         value: undefined,
+        priority: 16
       },
       type: undefined,
       state: this.STATES.normal,
@@ -129,14 +120,14 @@ export default {
     this.data.value = this.defaultValue;
     this.type = this.TYPES.string;
 
-    if(this.dataType.toLowerCase() === "boolean") this.type = this.TYPES.boolean;
+    if (this.dataType.toLowerCase() === "boolean") this.type = this.TYPES.boolean;
 
     this.state = this.STATES.normal;
   },
   methods: {
     update() {
       this.state = this.STATES.processing;
-      this.$emit("update", this.data.value);
+      this.$emit("update", { value: this.data.value, priority: this.data.priority });
     },
 
     setNormalMode() {
@@ -167,7 +158,7 @@ export default {
 <style scoped>
 .endpoint_popover_container {
   width: 200px;
-  height: 150px;
+  height: 200px;
   pointer-events: all;
 }
 
@@ -249,20 +240,24 @@ export default {
 .vue-slider-mark {
   z-index: 4;
 }
+
 .vue-slider-mark:first-child .vue-slider-mark-step,
 .vue-slider-mark:last-child .vue-slider-mark-step {
   display: none;
 }
+
 .vue-slider-mark-step {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.16);
 }
+
 .vue-slider-mark-label {
   font-size: 14px;
   white-space: nowrap;
 }
+
 /* dot style */
 .vue-slider-dot-handle {
   cursor: pointer;
@@ -273,6 +268,7 @@ export default {
   box-sizing: border-box;
   box-shadow: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0.32);
 }
+
 .vue-slider-dot-handle-focus {
   box-shadow: 0px 0px 1px 2px rgba(52, 152, 219, 0.36);
 }
@@ -294,10 +290,12 @@ export default {
   background-color: #3498db;
   box-sizing: content-box;
 }
+
 .vue-slider-dot-tooltip-inner::after {
   content: "";
   position: absolute;
 }
+
 .vue-slider-dot-tooltip-inner-top::after {
   top: 100%;
   left: 50%;
@@ -309,6 +307,7 @@ export default {
   border-width: 5px;
   border-top-color: inherit;
 }
+
 .vue-slider-dot-tooltip-inner-bottom::after {
   bottom: 100%;
   left: 50%;
@@ -320,6 +319,7 @@ export default {
   border-width: 5px;
   border-bottom-color: inherit;
 }
+
 .vue-slider-dot-tooltip-inner-left::after {
   left: 100%;
   top: 50%;
@@ -331,6 +331,7 @@ export default {
   border-width: 5px;
   border-left-color: inherit;
 }
+
 .vue-slider-dot-tooltip-inner-right::after {
   right: 100%;
   top: 50%;
@@ -347,6 +348,7 @@ export default {
   opacity: 0;
   transition: all 0.3s;
 }
+
 .vue-slider-dot-tooltip-wrapper-show {
   opacity: 1;
 }
